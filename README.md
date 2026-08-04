@@ -31,50 +31,6 @@ Dữ liệu bao gồm các tài liệu chuyên ngành: **Tài liệu Viện Nghi
 
 ---
 
-## Kiến Trúc Hệ Thống
-
-```mermaid
-graph TD
-    %% Data Processing Pipeline
-    subgraph Data Pipeline
-        A[PDF/News Data] -->|Task 3| B[Markdown Converter]
-        B -->|Task 4| C[RecursiveTextSplitter]
-        C -->|BAAI/bge-m3| D[(ChromaDB Vector Store)]
-        B -->|Task 6| E[(BM25 / TF-IDF Index)]
-    end
-
-    %% Query Pipeline
-    subgraph Retrieval Pipeline
-        Q[User Query] --> H{HyDE Enabled?}
-        H -- Yes --> H1[LLM: Hypothetical Answer] --> Q2[Expanded Query]
-        H -- No --> Q2[Original Query]
-        
-        Q2 -->|Task 5| S1[Semantic Search]
-        S1 --> D
-        
-        Q2 -->|Task 6| S2[Lexical Search]
-        S2 --> E
-        
-        S1 & S2 -->|Task 7| F[RRF Merging]
-        F --> R[Cross-Encoder Reranker]
-        
-        R --> C1{Score < Threshold?}
-        C1 -- Yes -->|Task 8| V[PageIndex Fallback]
-        C1 -- No --> Final[Top K Context]
-        V --> Final
-    end
-
-    %% Generation Pipeline
-    subgraph Generation Pipeline
-        Final --> G[Context Formatter]
-        Q --> G
-        G -->|Task 10| L[OpenAI/OpenRouter LLM]
-        L --> UI[Streamlit UI]
-    end
-```
-
----
-
 ## Cấu Trúc Thư Mục
 
 ```
@@ -593,8 +549,44 @@ run_dashboard()
 
 ### Kiến Trúc Hệ Thống
 
-```
-[Vẽ diagram kiến trúc ở đây]
+```mermaid
+graph TD
+    %% Data Processing Pipeline
+    subgraph Data Pipeline
+        A[PDF/News Data] -->|Task 3| B[Markdown Converter]
+        B -->|Task 4| C[RecursiveTextSplitter]
+        C -->|BAAI/bge-m3| D[(ChromaDB Vector Store)]
+        B -->|Task 6| E[(BM25 / TF-IDF Index)]
+    end
+
+    %% Query Pipeline
+    subgraph Retrieval Pipeline
+        Q[User Query] --> H{HyDE Enabled?}
+        H -- Yes --> H1[LLM: Hypothetical Answer] --> Q2[Expanded Query]
+        H -- No --> Q2[Original Query]
+        
+        Q2 -->|Task 5| S1[Semantic Search]
+        S1 --> D
+        
+        Q2 -->|Task 6| S2[Lexical Search]
+        S2 --> E
+        
+        S1 & S2 -->|Task 7| F[RRF Merging]
+        F --> R[Cross-Encoder Reranker]
+        
+        R --> C1{Score < Threshold?}
+        C1 -- Yes -->|Task 8| V[PageIndex Fallback]
+        C1 -- No --> Final[Top K Context]
+        V --> Final
+    end
+
+    %% Generation Pipeline
+    subgraph Generation Pipeline
+        Final --> G[Context Formatter]
+        Q --> G
+        G -->|Task 10| L[OpenAI/OpenRouter LLM]
+        L --> UI[Streamlit UI]
+    end
 ```
 
 ---
@@ -603,10 +595,12 @@ run_dashboard()
 
 | Thành viên | MSSV | Nhiệm vụ | Trạng thái |
 |-----------|------|----------|------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Vũ Hải Nam| 2A202601173|Role1: Quản lý nhóm, kiến trúc Supervisor và điều phối thuyết trình demo + Chạy RAGAS benchmark & viết báo cáo results.md. |Đã xong |
+| Ong Xuân Sơn|2A202601327 | Role6: Xây dựng golden_dataset.json mở rộng (20 câu hỏi) + hỗ trợ viết báo cáo result|Đã xong |
+| Nguyễn Minh Nhật| 2A202601131|Role5: Thiết kế Streamlit Chatbot app.py + Task 10 (Citation Generation) | Đã xong|
+| Nguyễn Duy Dũng|2A202601505 | Role4: Task 6 (BM25 / TF-IDF) + Task 7 (RRF Reranking) + Task 8 (PageIndex Fallback)|Đã xong |
+| Nguyễn Tiến Thành| 2A202601539| Role 3: Task 4 (Chunking & ChromaDB Indexing) + Task 5 (Semantic Search & HyDE)| Đã xong|
+| Giang Minh Phú|2A202601729 |Role2: Phụ trách Task 1 (tải PDF chính sách) + Task 2 (crawl bài viết tin tức) + Task 3 (convert Markdown) | Đã xong|
 
 ---
 
@@ -717,18 +711,7 @@ pytest tests/test_individual.py::TestTask5 -v
 
 ---
 
-## Phân Công Công Việc
 
-| Thành viên | MSSV | Nhiệm vụ | Trạng thái |
-|-----------|------|----------|------------|
-| Vũ Hải Nam| 2A202601173|Role1: Quản lý nhóm, kiến trúc Supervisor và điều phối thuyết trình demo + Chạy RAGAS benchmark & viết báo cáo results.md. |Đã xong |
-| Ong Xuân Sơn|2A202601327 | Role6: Xây dựng golden_dataset.json mở rộng (20 câu hỏi) + hỗ trợ viết báo cáo result|Đã xong |
-| Nguyễn Minh Nhật| 2A202601131|Role5: Thiết kế Streamlit Chatbot app.py + Task 10 (Citation Generation) | Đã xong|
-| Nguyễn Duy Dũng|2A202601505 | Role4: Task 6 (BM25 / TF-IDF) + Task 7 (RRF Reranking) + Task 8 (PageIndex Fallback)|Đã xong |
-| Nguyễn Tiến Thành| 2A202601539| Role 3: Task 4 (Chunking & ChromaDB Indexing) + Task 5 (Semantic Search & HyDE)| Đã xong|
-| Giang Minh Phú|2A202601729 |Role2: Phụ trách Task 1 (tải PDF chính sách) + Task 2 (crawl bài viết tin tức) + Task 3 (convert Markdown) | Đã xong|
-
----
 
 ## Hướng Dẫn Thời Gian
 
