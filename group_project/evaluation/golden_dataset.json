@@ -98,5 +98,155 @@
     "question": "Tài liệu trong repo có cung cấp thông tin về học phí chương trình Business của RMIT Vietnam không?",
     "expected_answer": "Không. Bộ tài liệu hiện có trong repo tập trung vào di sản văn hóa phi vật thể, áo dài ngũ thân, Xòe Thái, tranh Đông Hồ, Lễ hội Nguyên tiêu và tín ngưỡng thờ Mẫu; không có evidence về học phí chương trình Business của RMIT Vietnam.",
     "expected_context": "Out-of-domain / kiểm tra fallback và khả năng trả lời 'I cannot verify this information'"
+  },
+  {
+    "question": "Lễ hội Nguyên tiêu tại Trà Cú thu hút những ai tham gia?",
+    "expected_answer": "Lễ hội thu hút đông đảo người dân địa phương và du khách thập phương, trở thành biểu tượng đoàn kết của ba dân tộc Kinh - Hoa - Khmer.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Trong Lễ hội Nguyên tiêu, Phước Thắng Cung thờ vị thần nào?",
+    "expected_answer": "Phước Thắng Cung là nơi thờ Ông Bổn (Bổn Đầu Công) - vị thần bảo trợ của cộng đồng người Hoa tại địa phương.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Ai là người có vai trò quan trọng trong việc gìn giữ nghệ thuật Xòe Thái?",
+    "expected_answer": "Cộng đồng người Thái ở các tỉnh Tây Bắc, đặc biệt là các nghệ nhân dân gian, là những người đóng vai trò nòng cốt trong việc bảo vệ và trao truyền nghệ thuật Xòe Thái.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Ý nghĩa tâm linh của Xòe nghi lễ là gì?",
+    "expected_answer": "Xòe nghi lễ gắn liền với các lễ hội tín ngưỡng, thể hiện lòng biết ơn thần linh và tổ tiên, cầu mong mùa màng tươi tốt, cuộc sống bình an.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Đặc trưng của động tác trong nghệ thuật Xòe Thái?",
+    "expected_answer": "Các động tác Xòe Thái mô phỏng bước đi của người nông dân trên ruộng bậc thang, với nhịp điệu nhịp nhàng, uyển chuyển, kết nối mọi người lại với nhau.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Giấy dó dùng trong tranh Đông Hồ được làm từ gì?",
+    "expected_answer": "Giấy dó được làm từ vỏ cây dó, tạo ra bề mặt xốp, dai và dễ bám mực, sau đó được quét một lớp điệp để tạo độ sáng lấp lánh.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Tranh Đông Hồ 'Đám cưới chuột' mang ý nghĩa gì?",
+    "expected_answer": "Bức tranh phản ánh sâu sắc xã hội phong kiến, thể hiện mong ước về sự hòa bình, răn dạy đạo lý và phê phán nạn tham nhũng một cách hài hước.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Quy trình in tranh Đông Hồ khác biệt như thế nào so với các dòng tranh khác?",
+    "expected_answer": "Tranh Đông Hồ không dùng cọ vẽ mà hoàn toàn in bằng ván khắc gỗ. Mỗi màu tương ứng với một bản khắc, màu in trước phải đợi khô mới in màu sau.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Trong Đạo Mẫu, 'Thực hành tín ngưỡng thờ Mẫu Tam phủ' có những nghi lễ chính nào?",
+    "expected_answer": "Nghi lễ cốt lõi của tín ngưỡng này là Hầu đồng (Lên đồng) và hát Chầu văn, nơi nghệ nhân kết nối với các vị thần linh thông qua âm nhạc và vũ đạo.",
+    "expected_context": "data/standardized/legal/vicas_nguyen_thi_hien_tho_mau_tam_phu.md"
+  },
+  {
+    "question": "Thánh Mẫu Liễu Hạnh là ai trong tín ngưỡng Tam phủ?",
+    "expected_answer": "Thánh Mẫu Liễu Hạnh là vị thần chủ trong tín ngưỡng thờ Mẫu Tam phủ, được xem là một trong Tứ bất tử của tín ngưỡng dân gian Việt Nam, cai quản miền Đất (Địa phủ).",
+    "expected_context": "data/standardized/legal/vicas_nguyen_thi_hien_tho_mau_tam_phu.md"
+  },
+  {
+    "question": "Tại sao việc thương mại hóa quá mức lại đe dọa tín ngưỡng thờ Mẫu?",
+    "expected_answer": "Thương mại hóa khiến nghi lễ Hầu đồng bị lạm dụng để trục lợi, làm sai lệch ý nghĩa tâm linh nguyên bản và biến di sản thành công cụ kinh doanh mê tín.",
+    "expected_context": "data/standardized/legal/vicas_nguyen_thi_hien_tho_mau_tam_phu.md"
+  },
+  {
+    "question": "Khái niệm 'Không gian văn hóa' có vai trò gì trong bảo tồn di sản?",
+    "expected_answer": "Không gian văn hóa cung cấp bối cảnh sống động để di sản tồn tại. Nếu tách rời khỏi không gian cộng đồng, di sản sẽ mất đi ý nghĩa thực tiễn và biến thành 'hiện vật chết' trong bảo tàng.",
+    "expected_context": "data/standardized/legal/vicas_dang_van_bai_di_san_van_hoa_khong_gian.md"
+  },
+  {
+    "question": "Ai là người chịu trách nhiệm chính trong việc bảo vệ di sản văn hóa phi vật thể?",
+    "expected_answer": "Cộng đồng chủ thể (người dân địa phương) là những người sáng tạo, duy trì và truyền dạy di sản, đóng vai trò then chốt trong việc bảo vệ di sản văn hóa phi vật thể.",
+    "expected_context": "data/standardized/legal/vicas_dang_van_bai_di_san_van_hoa_khong_gian.md"
+  },
+  {
+    "question": "Theo Võ Vương Nguyễn Phúc Khoát, áo ngũ thân nữ giới khác biệt ra sao?",
+    "expected_answer": "Áo ngũ thân nữ giới không có nhiều khác biệt lớn về cấu trúc cơ bản so với nam giới, nhưng thường chú trọng màu sắc tươi sáng hơn và họa tiết thêu trang trí đa dạng.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Phần cổ áo của Áo dài ngũ thân truyền thống được thiết kế như thế nào?",
+    "expected_answer": "Cổ áo ngũ thân thường là cổ đứng (cổ trụ), cao khoảng 2-3 cm, ôm sát vào cổ người mặc tạo sự trang nghiêm, kín đáo.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Tại sao áo ngũ thân lại ít được mặc trong đời sống hiện đại hàng ngày?",
+    "expected_answer": "Do cấu tạo nhiều lớp vải, phom dáng rộng và quy trình may phức tạp, áo ngũ thân dần nhường chỗ cho các loại trang phục Âu phục gọn gàng, tiện lợi hơn trong sinh hoạt.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Lễ hội Đền Hùng được tổ chức vào ngày nào hàng năm?",
+    "expected_answer": "Mặc dù tài liệu hiện tại không đi sâu chi tiết, Lễ hội Đền Hùng (Giỗ Tổ Hùng Vương) truyền thống luôn diễn ra vào mùng 10 tháng 3 Âm lịch.",
+    "expected_context": "Out-of-domain"
+  },
+  {
+    "question": "Các quy định pháp luật nào bảo vệ quyền lợi của nghệ nhân dân gian?",
+    "expected_answer": "Luật Di sản Văn hóa sửa đổi có các điều khoản tôn vinh và hỗ trợ sinh kế cho Nghệ nhân Nhân dân, Nghệ nhân Ưu tú nhằm khuyến khích họ truyền dạy di sản.",
+    "expected_context": "data/standardized/legal/tinnguong101.md"
+  },
+  {
+    "question": "Hoạt động tín ngưỡng nào bị pháp luật nghiêm cấm?",
+    "expected_answer": "Pháp luật nghiêm cấm các hoạt động lợi dụng tín ngưỡng để lừa đảo, trục lợi, truyền bá mê tín dị đoan và xâm phạm an ninh trật tự công cộng.",
+    "expected_context": "data/standardized/legal/tinnguong101.md"
+  },
+  {
+    "question": "Xòe Thái có bao nhiêu điệu Xòe cổ cơ bản?",
+    "expected_answer": "Có 6 điệu Xòe cổ cơ bản, bao gồm Khắm khen (nắm tay nhau), Nhôm khăn (tung khăn), Đổn hôn (tiến lùi), Phá xí (bổ bốn), Khắm khăn mơi lả (nâng khăn mời rượu) và Ỏm lọp tốp mư (vỗ tay vòng tròn).",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Không gian văn hóa Cồng chiêng Tây Nguyên thuộc loại hình di sản nào?",
+    "expected_answer": "Tài liệu hiện tại không có thông tin chi tiết về Không gian văn hóa Cồng chiêng Tây Nguyên, nhưng nó được biết đến là Kiệt tác di sản truyền khẩu và phi vật thể nhân loại.",
+    "expected_context": "Out-of-domain"
+  },
+  {
+    "question": "Kỹ thuật 'sáng tối' có được dùng trong tranh Đông Hồ truyền thống không?",
+    "expected_answer": "Không. Tranh Đông Hồ truyền thống sử dụng các mảng màu bệt đồng nhất và viền nét đen chứ không dùng kỹ thuật tạo khối sáng tối (chiaroscuro) của phương Tây.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Trong Lễ hội Nguyên tiêu Trà Cú, hội thi múa lân sư rồng thường diễn ra ở đâu?",
+    "expected_answer": "Hội thi thường diễn ra tại sân bãi rộng quanh các cơ sở tín ngưỡng của người Hoa và dọc các tuyến đường chính của thị trấn Định An.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Trang phục Áo tấc là gì?",
+    "expected_answer": "Áo tấc thực chất là một biến thể của áo ngũ thân với ống tay rộng (tay thụng), thường được mặc trong các dịp lễ tiết quan trọng hoặc nghi thức cúng tế.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Yếu tố 'nhạc' trong Hầu đồng gọi là gì?",
+    "expected_answer": "Đó là Hát văn (hay Chầu văn), một loại hình diễn xướng âm nhạc tâm linh sử dụng đàn nguyệt, trống, phách để kể về sự tích các vị thần.",
+    "expected_context": "data/standardized/legal/vicas_nguyen_thi_hien_tho_mau_tam_phu.md"
+  },
+  {
+    "question": "Có nên đồng nhất di sản văn hóa với các tài nguyên du lịch thông thường không?",
+    "expected_answer": "Theo các chuyên gia, không nên đồng nhất vì di sản mang chiều sâu tâm linh và bản sắc cộng đồng, nếu khai thác du lịch ồ ạt sẽ làm biến dạng và suy thoái giá trị cốt lõi.",
+    "expected_context": "data/standardized/legal/vicas_dang_van_bai_di_san_van_hoa_khong_gian.md"
+  },
+  {
+    "question": "Điểm chung giữa Xòe Thái và Không gian Cồng chiêng là gì?",
+    "expected_answer": "Cả hai đều mang tính cộng đồng cao, kết nối con người với thế giới tâm linh, và đều được UNESCO vinh danh là di sản văn hóa phi vật thể của nhân loại.",
+    "expected_context": "Out-of-domain"
+  },
+  {
+    "question": "Lễ hội cúng biển Mỹ Long diễn ra tại tỉnh nào?",
+    "expected_answer": "Tài liệu hiện tại tập trung vào Lễ hội Nguyên tiêu Trà Cú (Vĩnh Long), không đề cập chi tiết đến Lễ hội cúng biển Mỹ Long (thực tế ở Trà Vinh).",
+    "expected_context": "Out-of-domain"
+  },
+  {
+    "question": "Người dân dâng cúng gì trong Lễ hội Nguyên tiêu Trà Cú?",
+    "expected_answer": "Họ dâng cúng hương hoa, trà quả, heo quay và các vật phẩm truyền thống để tạ ơn thần linh phù hộ cho một năm bình an.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Tại sao màu đen trong tranh Đông Hồ lại dùng tro lá tre?",
+    "expected_answer": "Tro lá tre khi được ủ và nghiền kỹ sẽ tạo ra sắc đen tuyền rất sâu và bám tốt vào giấy dó, không bị phai mờ qua thời gian.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
   }
 ]

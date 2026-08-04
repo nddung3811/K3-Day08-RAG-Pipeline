@@ -52,9 +52,6 @@ def retrieve(
     search_method: str = "hybrid",
 ) -> list[dict]:
     """
-    if top_k <= 0 or not (query or "").strip():
-        return []
-
     Retrieval pipeline hoàn chỉnh với fallback logic.
 
     Pipeline:
@@ -82,6 +79,9 @@ def retrieve(
             'source': str  # 'hybrid' hoặc 'pageindex'
         }
     """
+    if top_k <= 0 or not (query or "").strip():
+        return []
+
     aliases = {"dense": "semantic", "bm25": "lexical", "pageindex": "vectorless"}
     search_method = aliases.get(search_method.lower().strip(), search_method.lower().strip())
     if search_method not in SEARCH_METHODS:
