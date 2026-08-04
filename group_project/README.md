@@ -69,8 +69,44 @@ Xem code mẫu (DeepEval/RAGAS/TruLens) chi tiết trong `README.md` gốc mục
 
 ## Kiến Trúc Hệ Thống
 
-```
-[Vẽ diagram kiến trúc ở đây]
+```mermaid
+graph TD
+    %% Data Processing Pipeline
+    subgraph Data Pipeline
+        A[PDF/News Data] -->|Task 3| B[Markdown Converter]
+        B -->|Task 4| C[RecursiveTextSplitter]
+        C -->|BAAI/bge-m3| D[(ChromaDB Vector Store)]
+        B -->|Task 6| E[(BM25 / TF-IDF Index)]
+    end
+
+    %% Query Pipeline
+    subgraph Retrieval Pipeline
+        Q[User Query] --> H{HyDE Enabled?}
+        H -- Yes --> H1[LLM: Hypothetical Answer] --> Q2[Expanded Query]
+        H -- No --> Q2[Original Query]
+        
+        Q2 -->|Task 5| S1[Semantic Search]
+        S1 --> D
+        
+        Q2 -->|Task 6| S2[Lexical Search]
+        S2 --> E
+        
+        S1 & S2 -->|Task 7| F[RRF Merging]
+        F --> R[Cross-Encoder Reranker]
+        
+        R --> C1{Score < Threshold?}
+        C1 -- Yes -->|Task 8| V[PageIndex Fallback]
+        C1 -- No --> Final[Top K Context]
+        V --> Final
+    end
+
+    %% Generation Pipeline
+    subgraph Generation Pipeline
+        Final --> G[Context Formatter]
+        Q --> G
+        G -->|Task 10| L[OpenAI/OpenRouter LLM]
+        L --> UI[Streamlit UI]
+    end
 ```
 
 ---
