@@ -95,7 +95,7 @@ graph TD
         F --> R[Cross-Encoder Reranker]
         
         R --> C1{Score < Threshold?}
-        C1 -- Yes -->|Task 8| V[PageIndex Fallback]
+        C1 -- "Yes (Task 8)" --> V[PageIndex Fallback]
         C1 -- No --> Final[Top K Context]
         V --> Final
     end
