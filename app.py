@@ -27,6 +27,14 @@ st.markdown("""
 :root { --ink:#2f211b; --red:#9f2d24; --gold:#d39a34; --cream:#fff9ed; }
 .stApp { background:var(--cream) !important; color:var(--ink) !important; font-family:'Be Vietnam Pro',sans-serif; }
 [data-testid="stAppViewContainer"], [data-testid="stMain"] { background:var(--cream) !important; }
+[data-testid="stMainBlockContainer"], .stMainBlockContainer { 
+  background-color:var(--cream) !important;
+  background-image:
+    radial-gradient(circle at 50% 0%, transparent 0 28px, rgba(159,45,36,.045) 29px 30px, transparent 31px 54px, rgba(211,154,52,.055) 55px 56px, transparent 57px),
+    repeating-conic-gradient(from 0deg at 50% 0%, rgba(159,45,36,.035) 0deg 3deg, transparent 3deg 15deg);
+  background-size:150px 150px;
+  background-position:center top;
+}
 [data-testid="stMain"] p, [data-testid="stMain"] label, [data-testid="stMain"] span { color:var(--ink); }
 [data-testid="stSidebar"] { background:#321f1a; border-right:1px solid #5d382b; }
 [data-testid="stSidebar"] * { color:#fff8e9 !important; }
@@ -47,9 +55,33 @@ st.markdown("""
 .ao-dai-logo { width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#fff1d2; color:#a63829; font-size:2rem; line-height:1; }
 div[data-testid="stChatMessage"] { background:#fff !important; border:1px solid #ead9b9; border-radius:16px; margin:.6rem 0; }
 div[data-testid="stChatMessage"] p, div[data-testid="stChatMessage"] span, div[data-testid="stChatMessage"] li { color:#2f211b !important; }
-div[data-testid="stChatInput"] { background:#fff9ed !important; }
-div[data-testid="stChatInput"] textarea { background:#fff !important; color:#2f211b !important; border:1px solid #c99a54 !important; }
-div[data-testid="stChatInput"] textarea::placeholder { color:#80684f !important; opacity:1; }
+/* Khung nhập: dải tối + viền đồng, gợi liên tưởng khung tranh/bình phong */
+div[data-testid="stChatInput"], .st-emotion-cache-jchovf.e1p9v2yr1 {
+  width:100% !important; max-width:100% !important;
+  background:#171922 !important;
+  border:1px solid #c99a54 !important;
+  border-radius:4px 22px 4px 22px !important;
+  padding:10px 14px !important;
+  box-shadow:0 -8px 24px rgba(37,25,20,.16) !important;
+}
+div[data-testid="stChatInput"]::before { content:""; position:absolute; inset:4px; pointer-events:none; border:1px solid rgba(245,208,127,.35); border-radius:2px 16px 2px 16px; }
+div[data-testid="stChatInput"] > div, .st-emotion-cache-jchovf.e1p9v2yr1 > div {
+  border-radius:30px !important; background:#fff !important; border:0 !important;
+  padding:5px 8px 5px 20px !important; box-shadow:0 2px 10px rgba(40,25,15,.10) !important;
+}
+div[data-testid="stChatInput"] textarea {
+  min-height:48px !important; background:#fff !important; color:#2f211b !important;
+  border:0 !important; border-radius:24px !important; padding:14px 8px !important;
+  font-weight:400 !important;
+}
+div[data-testid="stChatInput"] textarea::placeholder { color:#9b9188 !important; opacity:1; font-weight:300 !important; }
+div[data-testid="stChatInput"] button {
+  width:42px !important; height:42px !important; min-width:42px !important;
+  border-radius:50% !important; background:#a63829 !important; color:#fff !important;
+  border:0 !important; box-shadow:none !important;
+}
+div[data-testid="stChatInput"] button:hover { background:#82251f !important; }
+div[data-testid="stChatInput"] button svg { color:#fff !important; stroke:#fff !important; }
 .stAlert p { color:#2f211b !important; }
 .stButton button { border-radius:10px; border-color:#c99a54; }
 .stButton button p { color:#2f211b !important; }
