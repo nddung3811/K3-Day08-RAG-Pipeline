@@ -41,6 +41,7 @@ from .task8_pageindex_vectorless import pageindex_search
 SCORE_THRESHOLD = 0.3   # Nếu best score (cosine gốc) < threshold → fallback PageIndex
 DEFAULT_TOP_K = 5
 RERANK_METHOD = "rrf"  # "cross_encoder" | "mmr" | "rrf"
+SEARCH_METHODS = ("hybrid", "semantic", "lexical", "vectorless")
 
 
 def retrieve(
@@ -48,8 +49,12 @@ def retrieve(
     top_k: int = DEFAULT_TOP_K,
     score_threshold: float = SCORE_THRESHOLD,
     use_reranking: bool = True,
+    search_method: str = "hybrid",
 ) -> list[dict]:
     """
+    if top_k <= 0 or not (query or "").strip():
+        return []
+
     Retrieval pipeline hoàn chỉnh với fallback logic.
 
     Pipeline:
@@ -77,7 +82,25 @@ def retrieve(
             'source': str  # 'hybrid' hoặc 'pageindex'
         }
     """
-    # TODO: Implement full retrieval pipeline
+    aliases = {"dense": "semantic", "bm25": "lexical", "pageindex": "vectorless"}
+    search_method = aliases.get(search_method.lower().strip(), search_method.lower().strip())
+    if search_method not in SEARCH_METHODS:
+        raise ValueError(f"Unknown search_method: {search_method}. Choose one of {SEARCH_METHODS}")
+
+    if search_method == "semantic":
+        results = semantic_search(query, top_k=top_k)
+        for item in results:
+            item["source"] = "semantic"
+        return results
+    if search_method == "lexical":
+        results = lexical_search(query, top_k=top_k)
+        for item in results:
+            item["source"] = "lexical"
+        return results
+    if search_method == "vectorless":
+        return pageindex_search(query, top_k=top_k)
+
+    # Hybrid: dense + BM25, fused by rank, then optionally reranked.
     #
     # Step 1: Song song chạy semantic + lexical
     # dense_results = semantic_search(query, top_k=top_k * 2)
@@ -103,7 +126,24 @@ def retrieve(
     #         return fallback
     #
     # return final_results[:top_k]
-    raise NotImplementedError("Implement retrieve")
+    candidate_k = max(top_k * 2, top_k)
+    dense_results = semantic_search(query, top_k=candidate_k)
+    sparse_results = lexical_search(query, top_k=candidate_k)
+    merged = rerank_rrf([dense_results, sparse_results], top_k=top_k * 2)
+    for item in merged:
+        item["source"] = "hybrid"
+
+    if use_reranking and merged:
+        final_results = rerank(query, merged, top_k=top_k, method=RERANK_METHOD)
+    else:
+        final_results = merged[:top_k]
+
+    best_score = dense_results[0]["score"] if dense_results else 0.0
+    if best_score < score_threshold:
+        fallback = pageindex_search(query, top_k=top_k)
+        if fallback:
+            return fallback
+    return final_results[:top_k]
 
 
 if __name__ == "__main__":

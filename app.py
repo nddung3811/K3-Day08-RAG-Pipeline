@@ -30,10 +30,14 @@ st.markdown("""
 [data-testid="stMainBlockContainer"], .stMainBlockContainer { 
   background-color:var(--cream) !important;
   background-image:
+    linear-gradient(rgba(255,249,237,.88), rgba(255,249,237,.92)),
+    url("https://free.vector6.com/wp-content/uploads/2026/07/E269-vector-trong-dong.jpg"),
     radial-gradient(circle at 50% 0%, transparent 0 28px, rgba(159,45,36,.045) 29px 30px, transparent 31px 54px, rgba(211,154,52,.055) 55px 56px, transparent 57px),
     repeating-conic-gradient(from 0deg at 50% 0%, rgba(159,45,36,.035) 0deg 3deg, transparent 3deg 15deg);
-  background-size:150px 150px;
-  background-position:center top;
+  background-size:cover, 900px auto, 150px 150px, 150px 150px;
+  background-position:center, center 80px, center top, center top;
+  background-repeat:no-repeat, no-repeat, repeat, repeat;
+  background-attachment:fixed;
 }
 [data-testid="stMain"] p, [data-testid="stMain"] label, [data-testid="stMain"] span { color:var(--ink); }
 [data-testid="stSidebar"] { background:#321f1a; border-right:1px solid #5d382b; }
@@ -55,33 +59,75 @@ st.markdown("""
 .ao-dai-logo { width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#fff1d2; color:#a63829; font-size:2rem; line-height:1; }
 div[data-testid="stChatMessage"] { background:#fff !important; border:1px solid #ead9b9; border-radius:16px; margin:.6rem 0; }
 div[data-testid="stChatMessage"] p, div[data-testid="stChatMessage"] span, div[data-testid="stChatMessage"] li { color:#2f211b !important; }
-/* Khung nhập: dải tối + viền đồng, gợi liên tưởng khung tranh/bình phong */
+/* Khung nhập "Rồng ôm Minh Châu": line-art Lý–Trần + input hiện đại */
 div[data-testid="stChatInput"], .st-emotion-cache-jchovf.e1p9v2yr1 {
+  position:relative !important;
+  isolation:isolate;
   width:100% !important; max-width:100% !important;
-  background:#171922 !important;
-  border:1px solid #c99a54 !important;
-  border-radius:4px 22px 4px 22px !important;
-  padding:10px 14px !important;
-  box-shadow:0 -8px 24px rgba(37,25,20,.16) !important;
+  overflow:visible !important;
+  background:
+    radial-gradient(circle at 8% 20%, rgba(211,154,52,.13), transparent 22%),
+    radial-gradient(circle at 92% 80%, rgba(159,45,36,.13), transparent 24%),
+    linear-gradient(105deg,#12131a 0%,#1c1a1c 54%,#241916 100%) !important;
+  border:1px solid rgba(211,154,52,.68) !important;
+  border-radius:10px 28px 10px 28px !important;
+  padding:15px 20px !important;
+  box-shadow:0 -8px 28px rgba(37,25,20,.18), inset 0 0 24px rgba(211,154,52,.06) !important;
 }
-div[data-testid="stChatInput"]::before { content:""; position:absolute; inset:4px; pointer-events:none; border:1px solid rgba(245,208,127,.35); border-radius:2px 16px 2px 16px; }
+/* Một nét liền tạo đầu rồng bên trái, thân vờn mây và đuôi cuộn bên phải. */
+div[data-testid="stChatInput"]::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-13px -10px -11px -12px;
+  pointer-events:none;
+  opacity:.72;
+  background:center/100% 100% no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 118' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23d6a44f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M66 42C42 18 27 20 17 35c13-5 22-1 27 7-18-3-31 6-35 19 14-8 27-6 36 2-13 4-20 13-21 25 11-9 24-10 36-4 10 5 17 14 27 18H1108c20 0 34-8 43-21 8-12 10-25 2-34-5-6-15-6-20 0-7 8-1 19 9 18 13-1 24-13 21-27-3-17-18-27-33-24-15 3-25 17-23 31 2 17 17 28 35 27 24-1 40-23 36-46'/%3E%3Cpath d='M57 48c11-18 25-25 44-20-9 4-14 10-15 19 12-10 27-11 42-4-13 2-22 9-27 20 17-8 33-5 48 9M49 62c14 0 25 7 31 21M68 41c-8-13-6-24 4-34 1 12 7 20 18 24M1126 81c18 10 37 9 55-3-6 13-16 23-31 29 13 2 25-1 36-9-4 11-13 19-27 24M1161 48c13-8 23-20 27-36 5 14 3 27-5 39'/%3E%3Ccircle cx='62' cy='51' r='2.8' fill='%23efd083' stroke='none'/%3E%3Cpath opacity='.55' d='M92 90c125-12 230-12 355 0s230 12 355 0 214-12 329-1' stroke-dasharray='2 12'/%3E%3C/g%3E%3C/svg%3E");
+  filter:drop-shadow(0 1px 3px rgba(211,154,52,.22));
+}
+/* Quầng sáng nhẹ của "minh châu" phía sau ô nhập. */
+div[data-testid="stChatInput"]::after {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:9px 13px;
+  border-radius:999px;
+  background:rgba(255,244,214,.18);
+  filter:blur(10px);
+  pointer-events:none;
+}
 div[data-testid="stChatInput"] > div, .st-emotion-cache-jchovf.e1p9v2yr1 > div {
-  border-radius:30px !important; background:#fff !important; border:0 !important;
-  padding:5px 8px 5px 20px !important; box-shadow:0 2px 10px rgba(40,25,15,.10) !important;
+  border-radius:999px !important;
+  background:linear-gradient(180deg,#fff 0%,#fffaf1 100%) !important;
+  border:1px solid rgba(242,216,162,.92) !important;
+  padding:5px 8px 5px 22px !important;
+  box-shadow:0 3px 14px rgba(11,8,6,.24), inset 0 1px 0 #fff !important;
 }
 div[data-testid="stChatInput"] textarea {
-  min-height:48px !important; background:#fff !important; color:#2f211b !important;
+  min-height:48px !important; background:transparent !important; color:#2f211b !important;
   border:0 !important; border-radius:24px !important; padding:14px 8px !important;
   font-weight:400 !important;
 }
-div[data-testid="stChatInput"] textarea::placeholder { color:#9b9188 !important; opacity:1; font-weight:300 !important; }
+div[data-testid="stChatInput"] textarea::placeholder { color:#9b9188 !important; opacity:.92; font-weight:300 !important; }
 div[data-testid="stChatInput"] button {
   width:42px !important; height:42px !important; min-width:42px !important;
-  border-radius:50% !important; background:#a63829 !important; color:#fff !important;
-  border:0 !important; box-shadow:none !important;
+  border-radius:50% !important;
+  background:radial-gradient(circle at 35% 30%,#c95743 0%,#a63829 52%,#762018 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,231,185,.65) !important;
+  box-shadow:0 2px 8px rgba(117,28,20,.38), inset 0 1px 2px rgba(255,255,255,.32) !important;
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
 }
-div[data-testid="stChatInput"] button:hover { background:#82251f !important; }
+div[data-testid="stChatInput"] button:hover {
+  transform:scale(1.06);
+  filter:saturate(1.12) brightness(1.04);
+  box-shadow:0 0 0 4px rgba(201,154,84,.16), 0 4px 12px rgba(117,28,20,.42) !important;
+}
 div[data-testid="stChatInput"] button svg { color:#fff !important; stroke:#fff !important; }
+@media (max-width:700px) {
+  div[data-testid="stChatInput"] { padding:12px 12px !important; border-radius:8px 22px 8px 22px !important; }
+  div[data-testid="stChatInput"]::before { inset:-8px -5px; opacity:.52; }
+}
 .stAlert p { color:#2f211b !important; }
 .stButton button { border-radius:10px; border-color:#c99a54; }
 .stButton button p { color:#2f211b !important; }
@@ -111,6 +157,17 @@ with st.sidebar:
         max_value=10,
         value=5,
         help="Số đoạn tài liệu được truy hồi để tạo câu trả lời.",
+    )
+    search_method = st.selectbox(
+        "Phương pháp tìm kiếm",
+        options=["hybrid", "semantic", "lexical", "vectorless"],
+        format_func=lambda value: {
+            "hybrid": "🔀 Hybrid (Semantic + BM25)",
+            "semantic": "🧠 Semantic / Dense",
+            "lexical": "🔤 Lexical / BM25",
+            "vectorless": "🌳 Vectorless / PageIndex",
+        }[value],
+        help="Chọn cách truy hồi tài liệu trước khi tạo câu trả lời.",
     )
     st.caption(f"Đang dùng **{top_k}** tài liệu cho mỗi câu hỏi")
     st.divider()
@@ -171,7 +228,7 @@ if query:
         with st.spinner("Đang tra cứu tư liệu văn hóa…"):
             try:
                 from src.task10_generation import generate_with_citation
-                response = generate_with_citation(query, top_k=top_k)
+                response = generate_with_citation(query, top_k=top_k, search_method=search_method)
                 answer = response.get("answer", "Chưa có câu trả lời từ nguồn dữ liệu hiện có.")
                 sources = [s.get("metadata", {}).get("source", "Tài liệu văn hóa") for s in response.get("sources", [])]
             except (NotImplementedError, ImportError):
