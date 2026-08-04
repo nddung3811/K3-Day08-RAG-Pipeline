@@ -72,6 +72,16 @@ with st.sidebar:
     topic = st.selectbox("Chủ đề", TOPICS, label_visibility="collapsed")
     region = st.selectbox("Vùng văn hóa", ["Tất cả vùng miền", "Bắc Bộ", "Trung Bộ", "Nam Bộ", "Các dân tộc Việt Nam"])
     st.divider()
+    st.markdown("### ⚙️ Cài đặt tham số")
+    top_k = st.slider(
+        "Số tài liệu tham khảo (top_k)",
+        min_value=1,
+        max_value=10,
+        value=5,
+        help="Số đoạn tài liệu được truy hồi để tạo câu trả lời.",
+    )
+    st.caption(f"Đang dùng **{top_k}** tài liệu cho mỗi câu hỏi")
+    st.divider()
     st.markdown("### Câu hỏi gợi ý")
     for i, question in enumerate(SUGGESTIONS):
         if st.button(question, key=f"suggestion_{i}", use_container_width=True):
@@ -129,7 +139,7 @@ if query:
         with st.spinner("Đang tra cứu tư liệu văn hóa…"):
             try:
                 from src.task10_generation import generate_with_citation
-                response = generate_with_citation(query, top_k=5)
+                response = generate_with_citation(query, top_k=top_k)
                 answer = response.get("answer", "Chưa có câu trả lời từ nguồn dữ liệu hiện có.")
                 sources = [s.get("metadata", {}).get("source", "Tài liệu văn hóa") for s in response.get("sources", [])]
             except (NotImplementedError, ImportError):
