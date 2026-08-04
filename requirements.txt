@@ -24,6 +24,8 @@ pageindex>=0.1.0
 
 # Task 10 - Generation
 openai>=1.30.0
+# Task 10 - Generation
+openai>=1.30.0
 
 # Group project - UI
 streamlit>=1.35.0

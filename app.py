@@ -25,9 +25,15 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
 :root { --ink:#2f211b; --red:#9f2d24; --gold:#d39a34; --cream:#fff9ed; }
-.stApp { background:var(--cream); color:var(--ink); font-family:'Be Vietnam Pro',sans-serif; }
+.stApp { background:var(--cream) !important; color:var(--ink) !important; font-family:'Be Vietnam Pro',sans-serif; }
+[data-testid="stAppViewContainer"], [data-testid="stMain"] { background:var(--cream) !important; }
+[data-testid="stMain"] p, [data-testid="stMain"] label, [data-testid="stMain"] span { color:var(--ink); }
 [data-testid="stSidebar"] { background:#321f1a; border-right:1px solid #5d382b; }
 [data-testid="stSidebar"] * { color:#fff8e9 !important; }
+[data-testid="stSidebar"] button p { color:#fff8e9 !important; }
+[data-testid="stSidebar"] .stButton button { background:#fff5df !important; border:1px solid #d39a34 !important; color:#3b2921 !important; text-align:left !important; }
+[data-testid="stSidebar"] .stButton button p { color:#3b2921 !important; }
+[data-testid="stSidebar"] .stButton button:hover { background:#f5dcae !important; border-color:#a63829 !important; }
 .hero { padding:2.2rem 2.5rem; border-radius:24px; background:linear-gradient(120deg,#681d1a 0%,#a63829 55%,#d48e31 150%); color:white; box-shadow:0 10px 28px #8e483022; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:3rem; margin:0 0 .4rem; color:#fff9ed; }
 .hero p { max-width:730px; font-size:1.06rem; margin:0; color:#ffeac0; }
@@ -38,8 +44,15 @@ st.markdown("""
 .section-title { font-family:'Playfair Display',serif; color:var(--red); font-size:1.55rem; margin:1.8rem 0 .8rem; }
 .source { border-left:4px solid var(--gold); background:#fffaf0; padding:.75rem 1rem; border-radius:0 10px 10px 0; margin:.5rem 0; }
 .source small { color:#80684f; }
-div[data-testid="stChatMessage"] { background:#fff; border:1px solid #ead9b9; border-radius:16px; margin:.6rem 0; }
+.ao-dai-logo { width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#fff1d2; color:#a63829; font-size:2rem; line-height:1; }
+div[data-testid="stChatMessage"] { background:#fff !important; border:1px solid #ead9b9; border-radius:16px; margin:.6rem 0; }
+div[data-testid="stChatMessage"] p, div[data-testid="stChatMessage"] span, div[data-testid="stChatMessage"] li { color:#2f211b !important; }
+div[data-testid="stChatInput"] { background:#fff9ed !important; }
+div[data-testid="stChatInput"] textarea { background:#fff !important; color:#2f211b !important; border:1px solid #c99a54 !important; }
+div[data-testid="stChatInput"] textarea::placeholder { color:#80684f !important; opacity:1; }
+.stAlert p { color:#2f211b !important; }
 .stButton button { border-radius:10px; border-color:#c99a54; }
+.stButton button p { color:#2f211b !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -64,6 +77,11 @@ with st.sidebar:
         if st.button(question, key=f"suggestion_{i}", use_container_width=True):
             st.session_state.pending_query = question
     st.divider()
+    if st.button("🗑️ Xóa cuộc trò chuyện", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.pending_query = None
+        st.rerun()
+    st.divider()
     st.caption("Nguồn định hướng")
     st.caption("Viện Nghiên cứu Văn hóa · Sách Văn hóa Dân gian Việt Nam · Hồ sơ Di sản Văn hóa Phi vật thể")
 
@@ -82,9 +100,15 @@ st.markdown("""
 
 st.markdown('<div class="section-title">Hôm nay bạn muốn tìm hiểu điều gì?</div>', unsafe_allow_html=True)
 cols = st.columns(3)
-for col, icon, title, desc in zip(cols, ["🌾", "👘", "🎏"], ["Phong tục tập quán", "Trang phục truyền thống", "Lễ hội Việt Nam"], ["Ý nghĩa, nguồn gốc và những điều nên biết", "Áo dài, áo ngũ thân và trang phục 54 dân tộc", "Nghi lễ, câu chuyện và giá trị cộng đồng"]):
+ao_dai_logo = '<div class="ao-dai-logo" title="Áo dài Việt Nam">👘</div>'
+cards = [
+    ("🌾", "Phong tục tập quán", "Ý nghĩa, nguồn gốc và những điều nên biết"),
+    (ao_dai_logo, "Trang phục truyền thống", "Áo dài, áo ngũ thân và trang phục 54 dân tộc"),
+    ("🎏", "Lễ hội Việt Nam", "Nghi lễ, câu chuyện và giá trị cộng đồng"),
+]
+for col, (icon, title, desc) in zip(cols, cards):
     with col:
-        st.markdown(f'<div class="card"><div style="font-size:1.8rem">{icon}</div><h3>{title}</h3><p>{desc}</p></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="card"><div style="height:48px;display:flex;align-items:center;font-size:1.8rem">{icon}</div><h3>{title}</h3><p>{desc}</p></div>', unsafe_allow_html=True)
 
 st.markdown('<div class="section-title">Cuộc trò chuyện</div>', unsafe_allow_html=True)
 for message in st.session_state.messages:
