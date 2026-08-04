@@ -41,6 +41,11 @@ TEMPERATURE = 0.3
 OPENAI_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 
+# HyDE — Hypothetical Document Embeddings
+# Sinh một câu trả lời giả định trước, rồi dùng nó để tìm kiếm semantic.
+# Điều này giúp thu hẹp khoảng cách ngữ nghĩa giữa câu hỏi ngắn và tài liệu dài.
+HYDE_ENABLED = os.getenv("HYDE_ENABLED", "true").lower() == "true"
+
 
 # =============================================================================
 # SYSTEM PROMPT
@@ -55,6 +60,68 @@ Quy tắc bắt buộc:
 3. Nếu context không đủ thông tin → trả lời: "Tôi không thể xác minh thông tin này từ nguồn hiện có"
 4. Trả lời bằng tiếng Việt, có cấu trúc rõ ràng theo đoạn văn
 5. Không suy luận hay mở rộng ngoài những gì được nêu trong context"""
+
+HYDE_PROMPT = """Bạn là trợ lý chuyên về văn hóa, di sản và lễ hội Việt Nam.
+Dựa vào kiến thức của bạn, hãy viết một đoạn văn ngắn (3-5 câu) trả lời câu hỏi sau.
+Đoạn văn này sẽ được dùng để tìm kiếm tài liệu, nên hãy sử dụng nhiều từ khóa liên quan.
+Câu hỏi: {query}
+Đoạn văn giả định:"""
+
+
+def _get_llm_client():
+    """Return (OpenAI_client, model_name) or (None, None) if unavailable."""
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not openrouter_key and not openai_key:
+        return None, None
+    try:
+        from openai import OpenAI
+        if openrouter_key:
+            return OpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1"), OPENROUTER_MODEL
+        else:
+            # Dùng Wokushop proxy cho OpenAI key
+            return OpenAI(api_key=openai_key, base_url="https://llm.wokushop.com/v1"), OPENAI_MODEL
+    except Exception:
+        return None, None
+
+
+def hyde_expand_query(query: str) -> str:
+    """
+    HyDE — Hypothetical Document Embeddings.
+
+    Thay vì tìm kiếm trực tiếp bằng câu hỏi ngắn (ví dụ: "Xòe Thái là gì?"),
+    ta yêu cầu LLM sinh ra một đoạn trả lời giả định chứa nhiều từ khóa liên quan,
+    rồi dùng chính đoạn văn đó làm query cho Semantic Search.
+
+    Lợi ích:
+      - Thu hẹp khoảng cách ngữ nghĩa giữa câu hỏi và tài liệu.
+      - Embedding của đoạn văn dài giàu ngữ cảnh hơn câu hỏi ngắn.
+
+    Args:
+        query: Câu hỏi gốc của người dùng.
+
+    Returns:
+        Chuỗi query mở rộng = câu hỏi gốc + đoạn giả định.
+    """
+    if not HYDE_ENABLED:
+        return query
+
+    client, model = _get_llm_client()
+    if client is None:
+        return query
+
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": HYDE_PROMPT.format(query=query)}],
+            temperature=0.7,
+            max_tokens=200,
+        )
+        hypothetical = response.choices[0].message.content or ""
+        # Nối câu hỏi gốc + đoạn giả định để embedding bao quát hơn
+        return f"{query}\n\n{hypothetical.strip()}"
+    except Exception:
+        return query
 
 
 def _fallback_answer(chunks: list[dict]) -> str:
@@ -136,20 +203,30 @@ def format_context(chunks: list[dict]) -> str:
 # GENERATION
 # =============================================================================
 
-def generate_with_citation(query: str, top_k: int = TOP_K, search_method: str = "hybrid") -> dict:
+def generate_with_citation(
+    query: str,
+    top_k: int = TOP_K,
+    search_method: str = "hybrid",
+    conversation_history: list[dict] | None = None,
+) -> dict:
     """
-    End-to-end RAG generation có citation.
+    End-to-end RAG generation có citation + conversation memory.
 
     Pipeline:
-        1. Retrieve relevant chunks
-        2. Reorder để tránh lost in the middle
-        3. Format context với source labels
-        4. Build prompt (system + context + query)
-        5. Call LLM
-        6. Return answer + sources
+        1. (Bonus) HyDE: sinh đoạn trả lời giả định → dùng làm query mở rộng
+        2. Retrieve relevant chunks
+        3. Reorder để tránh lost in the middle
+        4. Format context với source labels
+        5. Build prompt (system + history + context + query)
+        6. Call LLM
+        7. Return answer + sources
 
     Args:
         query: Câu hỏi của user
+        top_k: Số chunks đưa vào context
+        search_method: Phương pháp tìm kiếm ('hybrid', 'semantic', 'lexical', 'vectorless')
+        conversation_history: Danh sách tin nhắn trước đó [{"role": ..., "content": ...}]
+                              để hỗ trợ multi-turn chat (Bonus: Conversation Memory)
 
     Returns:
         {
@@ -158,49 +235,20 @@ def generate_with_citation(query: str, top_k: int = TOP_K, search_method: str = 
             'retrieval_source': str  # 'hybrid' hoặc 'pageindex'
         }
     """
-    # TODO: Implement generation pipeline
-    #
-    # # Step 1: Retrieve
-    # chunks = retrieve(query, top_k=top_k)
-    #
-    # # Step 2: Reorder
-    # reordered = reorder_for_llm(chunks)
-    #
-    # # Step 3: Format context
-    # context = format_context(reordered)
-    #
-    # # Step 4: Build prompt
-    # user_message = f"""Context:\n{context}\n\n---\n\nQuestion: {query}"""
-    #
-    # # Step 5: Call LLM (OpenRouter — OpenAI-compatible API)
-    # from openai import OpenAI
-    # api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-    # client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
-    #
-    # response = client.chat.completions.create(
-    #     model=LLM_MODEL,
-    #     messages=[
-    #         {"role": "system", "content": SYSTEM_PROMPT},
-    #         {"role": "user", "content": user_message}
-    #     ],
-    #     temperature=TEMPERATURE,
-    #     top_p=TOP_P,
-    # )
-    #
-    # answer = response.choices[0].message.content
-    #
-    # # Step 6: Return
-    # return {
-    #     "answer": answer,
-    #     "sources": chunks,
-    #     "retrieval_source": chunks[0].get("source", "hybrid") if chunks else "none"
-    # }
-    chunks = retrieve(query, top_k=top_k, search_method=search_method)
+    # Step 1 (Bonus): HyDE — mở rộng query bằng đoạn trả lời giả định
+    expanded_query = hyde_expand_query(query)
+
+    # Step 2: Retrieve với query đã mở rộng
+    chunks = retrieve(expanded_query, top_k=top_k, search_method=search_method)
+
+    # Step 3: Reorder để tránh lost in the middle
     reordered = reorder_for_llm(chunks)
+
+    # Step 4: Format context
     context = format_context(reordered)
-    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
-    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
-    if not openrouter_key and not openai_key:
+
+    client, model = _get_llm_client()
+    if client is None:
         return {
             "answer": _fallback_answer(chunks),
             "sources": chunks,
@@ -208,28 +256,29 @@ def generate_with_citation(query: str, top_k: int = TOP_K, search_method: str = 
         }
 
     try:
-        from openai import OpenAI
+        # Step 5: Build messages với conversation memory (Bonus)
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-        if openrouter_key:
-            client = OpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
-            model = OPENROUTER_MODEL
-        else:
-            client = OpenAI(api_key=openai_key)
-            model = OPENAI_MODEL
+        # Thêm lịch sử hội thoại (tối đa 6 lượt gần nhất để không vượt context window)
+        if conversation_history:
+            recent_history = conversation_history[-6:]
+            for msg in recent_history:
+                if msg.get("role") in ("user", "assistant"):
+                    messages.append({"role": msg["role"], "content": msg["content"]})
 
+        messages.append(
+            {"role": "user", "content": f"Context:\n{context}\n\n---\n\nQuestion: {query}"}
+        )
+
+        # Step 6: Call LLM
         response = client.chat.completions.create(
             model=model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Context:\n{context}\n\n---\n\nQuestion: {query}"},
-            ],
+            messages=messages,
             temperature=TEMPERATURE,
             top_p=TOP_P,
         )
         answer = response.choices[0].message.content or _fallback_answer(chunks)
     except Exception:
-        # The UI remains usable if the SDK is missing, the key is invalid,
-        # there is no network, or the provider temporarily fails.
         answer = _fallback_answer(chunks)
 
     return {

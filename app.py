@@ -169,6 +169,11 @@ with st.sidebar:
         }[value],
         help="Chọn cách truy hồi tài liệu trước khi tạo câu trả lời.",
     )
+    use_hyde = st.toggle(
+        "💡 HyDE (Query Expansion)",
+        value=True,
+        help="Bật Hypothetical Document Embeddings: sinh câu trả lời giả định để tìm kiếm chính xác hơn.",
+    )
     st.caption(f"Đang dùng **{top_k}** tài liệu cho mỗi câu hỏi")
     st.divider()
     st.markdown("### Câu hỏi gợi ý")
@@ -227,22 +232,55 @@ if query:
     with st.chat_message("assistant"):
         with st.spinner("Đang tra cứu tư liệu văn hóa…"):
             try:
+                import os as _os
+                _os.environ["HYDE_ENABLED"] = "true" if use_hyde else "false"
                 from src.task10_generation import generate_with_citation
-                response = generate_with_citation(query, top_k=top_k, search_method=search_method)
+                # Bonus: Conversation Memory — truyền lịch sử hội thoại
+                response = generate_with_citation(
+                    query,
+                    top_k=top_k,
+                    search_method=search_method,
+                    conversation_history=st.session_state.messages,
+                )
                 answer = response.get("answer", "Chưa có câu trả lời từ nguồn dữ liệu hiện có.")
-                sources = [s.get("metadata", {}).get("source", "Tài liệu văn hóa") for s in response.get("sources", [])]
+                sources_data = response.get("sources", [])
+                retrieval_source = response.get("retrieval_source", "unknown")
             except (NotImplementedError, ImportError):
                 answer = "Mình đã nhận câu hỏi. Hãy hoàn thiện pipeline RAG ở `src/task9_retrieval_pipeline.py` và `src/task10_generation.py` để trả lời dựa trên tư liệu đã lập chỉ mục."
-                sources = []
+                sources_data = []
+                retrieval_source = "none"
             except Exception as exc:
                 answer = f"Chưa thể truy cập bộ tư liệu lúc này. Chi tiết kỹ thuật: `{exc}`"
-                sources = []
+                sources_data = []
+                retrieval_source = "error"
         st.markdown(answer)
-        if sources:
-            with st.expander(f"📚 Nguồn tham khảo ({len(sources)})"):
-                for source in sources:
-                    st.markdown(f'<div class="source"><b>{source}</b><br><small>Tư liệu đã được truy hồi từ kho dữ liệu</small></div>', unsafe_allow_html=True)
-    st.session_state.messages.append({"role": "assistant", "content": answer, "sources": sources})
+        # Bonus UI: Hiển thị nguồn tài liệu có điểm số và phương pháp tìm kiếm
+        if sources_data:
+            source_names = []
+            with st.expander(f"📚 Nguồn tham khảo ({len(sources_data)}) • {retrieval_source.upper()}"):
+                for i, src in enumerate(sources_data, 1):
+                    meta = src.get("metadata", {})
+                    name = meta.get("source", "Tài liệu")
+                    score = src.get("score", 0)
+                    doc_type = meta.get("type", "")
+                    source_names.append(name)
+                    # Tạo thanh relevance score bằng CSS
+                    score_pct = min(int(score * 100), 100)
+                    score_color = "#2e7d32" if score_pct >= 70 else "#ed6c02" if score_pct >= 40 else "#d32f2f"
+                    content_preview = (src.get("content", ""))[:200].strip()
+                    st.markdown(f'''
+<div class="source">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+    <b>{i}. {name}</b>
+    <span style="background:{score_color};color:white;padding:2px 8px;border-radius:12px;font-size:.75rem">
+      Relevance: {score_pct}%
+    </span>
+  </div>
+  <small style="color:#80684f">🎯 {doc_type.upper()} • {content_preview}…</small>
+</div>''', unsafe_allow_html=True)
+        else:
+            source_names = []
+    st.session_state.messages.append({"role": "assistant", "content": answer, "sources": source_names if sources_data else []})
 
 if not st.session_state.messages:
     st.info("💬 Chọn một câu hỏi gợi ý ở thanh bên hoặc nhập câu hỏi ở ô trò chuyện bên dưới.")

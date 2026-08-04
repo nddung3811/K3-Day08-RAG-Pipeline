@@ -1,5 +1,5 @@
 ---
-title: University Services RAG Chatbot
+title: Trợ Lý Giải Đáp Phong Tục, Trang Phục & Lễ Hội Truyền Thống
 emoji: 🎓
 colorFrom: blue
 colorTo: indigo
@@ -13,21 +13,21 @@ pinned: false
 
 **Chương 2 | Ngày 8 trong 15**
 
-> Dùng chung chủ đề "University Services" với biến thể K3 của Ngày 7 (`K3_VARIANT.md`), để pipeline Ngày 7 → Ngày 8 nhất quán.
+> Triển khai hệ thống RAG chuyên sâu cho chủ đề Văn hóa, Phong tục, và Lễ hội Truyền thống Việt Nam.
 
 ---
 
 ## Mục Tiêu
 
-Xây dựng một RAG pipeline thực tế, end-to-end, từ thu thập dữ liệu chính sách và thông tin dịch vụ đại học → xử lý → indexing → retrieval (hybrid + vectorless fallback) → generation có citation.
+Xây dựng một RAG pipeline thực tế, end-to-end, từ thu thập dữ liệu văn hóa, di sản, lễ hội truyền thống → xử lý → indexing → retrieval (hybrid + vectorless fallback) → generation có citation.
 
 ---
 
 ## Chủ Đề Dữ Liệu
 
-**Chính sách/quy định dịch vụ đại học** (học phí, học bổng, ký túc xá, đăng ký học phần) + **Thông tin/thông báo đại học** (sự kiện, dịch vụ thư viện, hỗ trợ sinh viên)
+**Kiến thức văn hóa dân gian Việt Nam:** ý nghĩa phong tục tập quán, trang phục truyền thống (Áo ngũ thân, Áo dài, trang phục 54 dân tộc) và các lễ hội lớn.
 
-Dữ liệu mẫu trong repo được crawl thật từ trang công khai của **RMIT Vietnam** (rmit.edu.vn) — xem chi tiết URL nguồn trong `src/task1_collect_legal_docs.py` và `src/task2_crawl_news.py`.
+Dữ liệu bao gồm các tài liệu chuyên ngành: **Tài liệu Viện Nghiên cứu Văn hóa, sách Văn hóa Dân gian Việt Nam, Hồ sơ Di sản Văn hóa Phi vật thể.**
 
 ---
 
@@ -87,7 +87,7 @@ Tìm và tải về **tối thiểu 3 văn bản chính sách/quy định** dạ
 
 ### Task 2 — Crawl Bài Viết/Thông Báo
 
-Crawl **tối thiểu 5 bài viết** về thông tin/thông báo dịch vụ đại học (sự kiện, thư viện, hỗ trợ sinh viên, học bổng).
+Crawl **tối thiểu 5 bài viết** về văn hóa dân gian, lễ hội truyền thống, và tín ngưỡng (ví dụ: Lễ hội Gióng, Tín ngưỡng thờ Mẫu, Áo ngũ thân).
 
 **Thư viện khuyến nghị:** [Crawl4AI](https://github.com/unclecode/crawl4ai)
 
@@ -670,6 +670,19 @@ pytest tests/ -v
 pytest tests/test_individual.py::TestTask1 -v
 pytest tests/test_individual.py::TestTask5 -v
 ```
+
+---
+
+## Phân Công Công Việc
+
+| Thành viên | MSSV | Nhiệm vụ | Trạng thái |
+|-----------|------|----------|------------|
+| Vũ Hải Nam| 2A202601173|Role1: Quản lý nhóm, kiến trúc Supervisor và điều phối thuyết trình demo + Chạy RAGAS benchmark & viết báo cáo results.md. |Đã xong |
+| Ong Xuân Sơn|2A202601327 | Role6: Xây dựng golden_dataset.json mở rộng (20 câu hỏi) + hỗ trợ viết báo cáo result|Đã xong |
+| Nguyễn Minh Nhật| 2A202601131|Role5: Thiết kế Streamlit Chatbot app.py + Task 10 (Citation Generation) | Đã xong|
+| Nguyễn Duy Dũng|2A202601505 | Role4: Task 6 (BM25 / TF-IDF) + Task 7 (RRF Reranking) + Task 8 (PageIndex Fallback)|Đã xong |
+| Nguyễn Tiến Thành| 2A202601539| Role 3: Task 4 (Chunking & ChromaDB Indexing) + Task 5 (Semantic Search & HyDE)| Đã xong|
+| Giang Minh Phú|2A202601729 |Role2: Phụ trách Task 1 (tải PDF chính sách) + Task 2 (crawl bài viết tin tức) + Task 3 (convert Markdown) | Đã xong|
 
 ---
 

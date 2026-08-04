@@ -170,6 +170,79 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     return results
 
 
+def tfidf_search(query: str, top_k: int = 10) -> list[dict]:
+    """
+    Search by TF-IDF cosine similarity — một phương pháp Lexical Search KHÁC BM25.
+
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║  SO SÁNH CƠ CHẾ HOẠT ĐỘNG: TF-IDF vs BM25                            ║
+    ╠══════════════════════════════════════════════════════════════════════════╣
+    ║                                                                        ║
+    ║  TF-IDF (Term Frequency–Inverse Document Frequency):                   ║
+    ║    • TF = số lần từ xuất hiện / tổng từ trong tài liệu                 ║
+    ║    • IDF = log(N / df) — từ càng hiếm trong kho, trọng số càng cao     ║
+    ║    • Điểm = tổng TF × IDF cho mỗi từ trong query                      ║
+    ║    • Không có cơ chế kiểm soát "bão hòa" tần suất từ                   ║
+    ║                                                                        ║
+    ║  BM25 (Best Matching 25 — Okapi):                                      ║
+    ║    • Cải tiến TF: tf_bm25 = tf*(k1+1) / (tf + k1*(1-b+b*dl/avgdl))    ║
+    ║    • k1 (mặc định 1.5): kiểm soát "bão hòa" — từ lặp nhiều lần       ║
+    ║      KHÔNG cho thêm điểm vô hạn như TF-IDF thuần                       ║
+    ║    • b (mặc định 0.75): phạt tài liệu dài (document length norm)       ║
+    ║      Tài liệu dài tự nhiên chứa nhiều từ hơn → BM25 trừ điểm         ║
+    ║    • IDF cải tiến: log((N-df+0.5)/(df+0.5)) — ổn định hơn khi df→0   ║
+    ║                                                                        ║
+    ║  Kết luận:                                                             ║
+    ║    BM25 > TF-IDF vì:                                                   ║
+    ║    ✅ Kiểm soát bão hòa tần suất từ (saturation via k1)                ║
+    ║    ✅ Chuẩn hóa theo độ dài tài liệu (length norm via b)               ║
+    ║    ✅ IDF ổn định hơn với corpus nhỏ                                    ║
+    ║    ❌ TF-IDF thiên vị tài liệu dài, không có saturation                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+
+    Args:
+        query: Chuỗi truy vấn.
+        top_k: Số kết quả trả về.
+
+    Returns:
+        List of {'content', 'score', 'metadata'}, sorted by cosine similarity.
+    """
+    if top_k <= 0:
+        return []
+
+    corpus, _ = get_bm25_index()  # Tận dụng corpus đã load sẵn
+    if not corpus:
+        return []
+
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+    except ImportError:
+        return []  # scikit-learn chưa cài
+
+    texts = [doc["content"] for doc in corpus]
+    vectorizer = TfidfVectorizer(max_features=50000, sublinear_tf=True)
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    query_vec = vectorizer.transform([query])
+    scores = cosine_similarity(query_vec, tfidf_matrix).flatten()
+
+    ranked_indices = scores.argsort()[::-1][:top_k]
+    results: list[dict] = []
+    for idx in ranked_indices:
+        score = float(scores[idx])
+        if score <= 0:
+            break
+        results.append(
+            {
+                "content": corpus[idx]["content"],
+                "score": score,
+                "metadata": corpus[idx]["metadata"],
+            }
+        )
+
+    return results
+
+
 if __name__ == "__main__":
     results = lexical_search("tuition fee payment methods", top_k=5)
     for result in results:
