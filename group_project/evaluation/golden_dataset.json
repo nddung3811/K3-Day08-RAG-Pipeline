@@ -1,17 +1,102 @@
 [
   {
-    "question": "Học phí hàng năm của chương trình Business tại RMIT Vietnam là bao nhiêu?",
-    "expected_answer": "Khoảng 375.840.000 VND mỗi năm (tùy chương trình cụ thể).",
-    "expected_context": "Trang Tuition Fees, mục Undergraduate Programs"
+    "question": "Lễ hội Nguyên tiêu ở Trà Cú được đưa vào danh mục di sản văn hóa phi vật thể quốc gia trong sự kiện nào?",
+    "expected_answer": "Sáng ngày 03/3/2026, Sở Văn hóa, Thể thao và Du lịch tỉnh Vĩnh Long tổ chức lễ công bố Quyết định của Bộ trưởng Bộ Văn hóa, Thể thao và Du lịch Nguyễn Văn Hùng đưa Lễ hội Nguyên tiêu ở Trà Cú vào danh mục di sản văn hóa phi vật thể quốc gia.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
   },
   {
-    "question": "Học phí được thanh toán theo hình thức nào?",
-    "expected_answer": "Thanh toán theo từng học kỳ, tính theo từng môn học đã đăng ký.",
-    "expected_context": "Trang Tuition Fees, mục Payment Structure"
+    "question": "Lễ hội Nguyên tiêu ở Trà Cú ban đầu là lễ hội truyền thống của cộng đồng nào?",
+    "expected_answer": "Lễ hội Nguyên tiêu khởi nguồn là lễ hội truyền thống của cộng đồng người Hoa, sau đó trở thành ngày hội chung của ba dân tộc Hoa, Kinh và Khmer.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
   },
   {
-    "question": "Trường có cung cấp ký túc xá trong khuôn viên không?",
-    "expected_answer": "Không — trường không cung cấp chỗ ở trong khuôn viên, nhưng có đội ngũ hỗ trợ sinh viên tìm chỗ ở gần trường.",
-    "expected_context": "Trang Accommodation Services"
+    "question": "Trước kia Lễ hội Nguyên tiêu ở Đại An, Định An được tổ chức vào những ngày nào theo âm lịch?",
+    "expected_answer": "Trước kia, lễ hội được tổ chức trong hai ngày 14 và 15 tháng Giêng âm lịch tại các cơ sở tín ngưỡng trên địa bàn xã Đại An, Định An và thị trấn Định An.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Nghi thức rải gạo muối trong đoàn Nghinh Thần của Lễ hội Nguyên tiêu có ý nghĩa gì?",
+    "expected_answer": "Nghi thức rải gạo muối được thực hiện với niềm tin xua tan điều xấu, mang lại bình an và trao lộc đầu năm cho mọi người.",
+    "expected_context": "data/standardized/news/dsvh_le_hoi_nguyen_tieu_tra_cu.md"
+  },
+  {
+    "question": "Nghệ thuật Xòe Thái của Việt Nam được UNESCO ghi danh vào thời điểm nào và ở đâu?",
+    "expected_answer": "Nghệ thuật Xòe Thái được UNESCO ghi danh lúc 11 giờ 11 phút ngày 15/12/2021 giờ địa phương, tức 17 giờ 11 phút cùng ngày theo giờ Việt Nam, tại phiên họp lần thứ 16 của Ủy ban Liên Chính phủ Công ước 2003 diễn ra ở Paris, Pháp.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Có mấy loại Xòe Thái được nêu trong tài liệu và đó là những loại nào?",
+    "expected_answer": "Tài liệu nêu ba loại Xòe: Xòe nghi lễ, Xòe vòng và Xòe trình diễn.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Xòe vòng có đặc điểm gì nổi bật?",
+    "expected_answer": "Xòe vòng là loại phổ biến nhất, trong đó người Xòe nối thành vòng tròn trong sự hòa đồng với mọi người.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Những nhạc cụ nào đi kèm với di sản Xòe Thái theo tài liệu?",
+    "expected_answer": "Xòe Thái đi kèm với các nhạc cụ như tính tẩu, kèn loa, khèn bè, trống, chiêng, chũm chọe, pí pặp, bẳng bu và mák hính.",
+    "expected_context": "data/standardized/news/dsvh_nghe_thuat_xoe_thai_unesco.md"
+  },
+  {
+    "question": "Nghề làm tranh dân gian Đông Hồ được UNESCO ghi danh vào danh sách nào?",
+    "expected_answer": "Nghề làm tranh dân gian Đông Hồ được UNESCO ghi danh vào Danh sách di sản văn hóa phi vật thể cần bảo vệ khẩn cấp.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Nghề làm tranh dân gian Đông Hồ được ghi danh tại kỳ họp UNESCO nào và vào thời điểm nào?",
+    "expected_answer": "Di sản được ghi danh tại Kỳ họp lần thứ 20 của Ủy ban Liên chính phủ Công ước 2003, lúc 14h38 ngày 09/12/2025 giờ địa phương tại New Delhi, Ấn Độ, tức 16h08 giờ Hà Nội.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Tranh dân gian Đông Hồ sử dụng những nguyên liệu tự nhiên nào để tạo màu?",
+    "expected_answer": "Màu xanh được chế biến từ lá chàm, màu đỏ từ sỏi son, màu vàng từ hoa hòe và quả dành dành, màu trắng từ bột sò điệp bị phong hóa, màu đen từ tro lá tre và rơm nếp.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Vì sao nghề làm tranh dân gian Đông Hồ cần được bảo vệ khẩn cấp?",
+    "expected_answer": "Nghề cần được bảo vệ khẩn cấp vì số lượng nghệ nhân lành nghề đã giảm mạnh, chỉ còn vài hộ gia đình duy trì nghề, thế hệ trẻ ít quan tâm, nghề khó bảo đảm sinh kế và nhu cầu sử dụng tranh in khắc gỗ trong các dịp lễ truyền thống giảm sút.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Theo tài liệu, nghề làm tranh dân gian Đông Hồ ra đời ở đâu và có tuổi đời khoảng bao lâu?",
+    "expected_answer": "Nghề làm tranh dân gian Đông Hồ ra đời ở khu phố Đông Khê, phường Thuận Thành, tỉnh Bắc Ninh và có tuổi đời khoảng 500 năm.",
+    "expected_context": "data/standardized/news/dsvh_tranh_dan_gian_dong_ho_unesco.md"
+  },
+  {
+    "question": "Áo dài ngũ thân được định hình dưới thời ai và vào năm nào?",
+    "expected_answer": "Áo dài ngũ thân được Võ Vương Nguyễn Phúc Khoát quy định và định hình kiểu dáng vào năm 1744.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Năm cúc áo của áo dài ngũ thân tượng trưng cho điều gì?",
+    "expected_answer": "Năm cúc áo tượng trưng cho năm đức tính Nhân, Lễ, Nghĩa, Trí, Tín.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Áo dài ngũ thân có mấy thân áo và ý nghĩa của các thân áo là gì?",
+    "expected_answer": "Áo dài ngũ thân có 5 thân áo: 4 thân bên ngoài tượng trưng cho tứ thân phụ mẫu, 1 thân bên trong tượng trưng cho người con.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Họa sĩ Nguyễn Cát Tường đã cải tiến áo dài vào năm nào và theo xu hướng nào?",
+    "expected_answer": "Năm 1930, họa sĩ Nguyễn Cát Tường cải tiến áo dài theo xu hướng mới với cách thiết kế nối vai, hai thân áo, tay bồng, vạt xéo, không cổ và nhiều kiểu dáng mang phong cách phương Tây.",
+    "expected_context": "data/standardized/news/bao_tang_phu_nu_ao_dai_ngu_than.md"
+  },
+  {
+    "question": "Theo bài viết của Đặng Văn Bài, vì sao cần nhìn di sản văn hóa trong phạm vi một không gian văn hóa nhất định?",
+    "expected_answer": "Theo bài viết, cần nhận diện giá trị di sản trong một không gian văn hóa nhất định vì di sản văn hóa chỉ có thể được bảo vệ và phát huy giá trị tốt nhất ở chính không gian văn hóa nơi nó được sáng tạo và duy trì.",
+    "expected_context": "data/standardized/legal/vicas_dang_van_bai_di_san_van_hoa_khong_gian.md"
+  },
+  {
+    "question": "Theo Nguyễn Thị Hiền, quản lý văn hóa đối với Thực hành thờ Mẫu Tam phủ của người Việt có tính chất gì?",
+    "expected_answer": "Theo Nguyễn Thị Hiền, quản lý văn hóa đối với Thực hành thờ Mẫu Tam phủ mang tính liên bộ, liên ngành, liên cấp nhằm làm rõ trách nhiệm của các cơ quan quản lý nhà nước đối với hoạt động tín ngưỡng và di sản.",
+    "expected_context": "data/standardized/legal/vicas_nguyen_thi_hien_tho_mau_tam_phu.md"
+  },
+  {
+    "question": "Tài liệu trong repo có cung cấp thông tin về học phí chương trình Business của RMIT Vietnam không?",
+    "expected_answer": "Không. Bộ tài liệu hiện có trong repo tập trung vào di sản văn hóa phi vật thể, áo dài ngũ thân, Xòe Thái, tranh Đông Hồ, Lễ hội Nguyên tiêu và tín ngưỡng thờ Mẫu; không có evidence về học phí chương trình Business của RMIT Vietnam.",
+    "expected_context": "Out-of-domain / kiểm tra fallback và khả năng trả lời 'I cannot verify this information'"
   }
 ]
