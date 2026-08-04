@@ -37,16 +37,17 @@ TOP_P = 0.9
 # Chọn 0.3 vì: RAG cần factual, ít sáng tạo
 TEMPERATURE = 0.3
 
-# TODO: Chọn LLM model (OpenRouter model ID)
-LLM_MODEL = "openai/gpt-4o-mini"  # hoặc model ":free" nếu chưa có credit
+# Có thể override bằng LLM_MODEL trong .env.
+OPENAI_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 
 
 # =============================================================================
 # SYSTEM PROMPT
 # =============================================================================
 
-SYSTEM_PROMPT = """Bạn là trợ lý trả lời câu hỏi về dịch vụ và chính sách đại học
-(học phí, học bổng, ký túc xá, thư viện, đăng ký học phần).
+SYSTEM_PROMPT = """Bạn là trợ lý Nếp Việt, chuyên trả lời câu hỏi về văn hóa,
+phong tục, trang phục, lễ hội và di sản Việt Nam.
 
 Quy tắc bắt buộc:
 1. Chỉ sử dụng thông tin từ context được cung cấp — KHÔNG bịa đặt
@@ -54,6 +55,24 @@ Quy tắc bắt buộc:
 3. Nếu context không đủ thông tin → trả lời: "Tôi không thể xác minh thông tin này từ nguồn hiện có"
 4. Trả lời bằng tiếng Việt, có cấu trúc rõ ràng theo đoạn văn
 5. Không suy luận hay mở rộng ngoài những gì được nêu trong context"""
+
+
+def _fallback_answer(chunks: list[dict]) -> str:
+    """Return a useful cited answer when the external LLM is unavailable."""
+    if not chunks:
+        return "Tôi không thể xác minh thông tin này từ nguồn hiện có."
+
+    evidence = []
+    for chunk in chunks[:3]:
+        metadata = chunk.get("metadata") or {}
+        source = metadata.get("source") or metadata.get("path") or "Tài liệu"
+        content = " ".join((chunk.get("content") or "").strip().split())
+        if content:
+            evidence.append(f"- {content[:650]} [{source}]")
+
+    if not evidence:
+        return "Tôi không thể xác minh thông tin này từ nguồn hiện có."
+    return "Các tư liệu phù hợp nhất mình tìm được:\n\n" + "\n\n".join(evidence)
 
 
 # =============================================================================
@@ -77,15 +96,11 @@ def reorder_for_llm(chunks: list[dict]) -> list[dict]:
     Returns:
         List reordered để maximize LLM attention.
     """
-    # TODO: Implement reordering
-    #
-    # if len(chunks) <= 2:
-    #     return chunks
-    #
-    # front = chunks[::2]   # index 0, 2, 4 -> đặt ở đầu
-    # back = chunks[1::2]   # index 1, 3    -> đặt ở cuối (reversed)
-    # return front + back[::-1]
-    raise NotImplementedError("Implement reorder_for_llm")
+    if len(chunks) <= 2:
+        return list(chunks)
+    front = chunks[::2]
+    back = chunks[1::2]
+    return front + back[::-1]
 
 
 # =============================================================================
@@ -103,25 +118,25 @@ def format_context(chunks: list[dict]) -> str:
     Returns:
         Formatted context string.
     """
-    # TODO: Implement context formatting
-    #
-    # context_parts = []
-    # for i, chunk in enumerate(chunks, 1):
-    #     source = chunk.get("metadata", {}).get("source", f"Source {i}")
-    #     doc_type = chunk.get("metadata", {}).get("type", "unknown")
-    #     context_parts.append(
-    #         f"[Document {i} | Source: {source} | Type: {doc_type}]\n"
-    #         f"{chunk['content']}\n"
-    #     )
-    # return "\n---\n".join(context_parts)
-    raise NotImplementedError("Implement format_context")
+    context_parts = []
+    for i, chunk in enumerate(chunks, 1):
+        metadata = chunk.get("metadata") or {}
+        source = metadata.get("source") or metadata.get("path") or f"Source {i}"
+        doc_type = metadata.get("type", "unknown")
+        content = (chunk.get("content") or "").strip()
+        if not content:
+            continue
+        context_parts.append(
+            f"[Document {i} | Source: {source} | Type: {doc_type}]\n{content}"
+        )
+    return "\n\n---\n\n".join(context_parts)
 
 
 # =============================================================================
 # GENERATION
 # =============================================================================
 
-def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
+def generate_with_citation(query: str, top_k: int = TOP_K, search_method: str = "hybrid") -> dict:
     """
     End-to-end RAG generation có citation.
 
@@ -180,7 +195,48 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
     #     "sources": chunks,
     #     "retrieval_source": chunks[0].get("source", "hybrid") if chunks else "none"
     # }
-    raise NotImplementedError("Implement generate_with_citation")
+    chunks = retrieve(query, top_k=top_k, search_method=search_method)
+    reordered = reorder_for_llm(chunks)
+    context = format_context(reordered)
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not openrouter_key and not openai_key:
+        return {
+            "answer": _fallback_answer(chunks),
+            "sources": chunks,
+            "retrieval_source": chunks[0].get("source", search_method) if chunks else "none",
+        }
+
+    try:
+        from openai import OpenAI
+
+        if openrouter_key:
+            client = OpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
+            model = OPENROUTER_MODEL
+        else:
+            client = OpenAI(api_key=openai_key)
+            model = OPENAI_MODEL
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": f"Context:\n{context}\n\n---\n\nQuestion: {query}"},
+            ],
+            temperature=TEMPERATURE,
+            top_p=TOP_P,
+        )
+        answer = response.choices[0].message.content or _fallback_answer(chunks)
+    except Exception:
+        # The UI remains usable if the SDK is missing, the key is invalid,
+        # there is no network, or the provider temporarily fails.
+        answer = _fallback_answer(chunks)
+
+    return {
+        "answer": answer,
+        "sources": chunks,
+        "retrieval_source": chunks[0].get("source", search_method) if chunks else "none",
+    }
 
 
 if __name__ == "__main__":

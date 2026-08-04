@@ -15,7 +15,7 @@ help:
 	@echo "  make compile   Check Python syntax"
 
 install:
-	$(PIP) install "streamlit>=1.35.0" "python-dotenv>=1.0.0"
+	$(PIP) install "streamlit>=1.35.0" "python-dotenv>=1.0.0" "openai>=1.30.0"
 
 install-full:
 	$(PIP) install --prefer-binary -r requirements.txt
