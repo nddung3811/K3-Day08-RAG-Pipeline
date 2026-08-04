@@ -530,10 +530,10 @@ run_dashboard()
 
 #### Deliverable Evaluation
 
-- [ ] File `group_project/evaluation/golden_dataset.json` — 15+ cặp Q&A
-- [ ] File `group_project/evaluation/eval_pipeline.py` — script chạy evaluation
-- [ ] File `group_project/evaluation/results.md` — bảng điểm + phân tích
-- [ ] So sánh A/B ít nhất 2 configs
+- [x] File `group_project/evaluation/golden_dataset.json` — 15+ cặp Q&A
+- [x] File `group_project/evaluation/eval_pipeline.py` — script chạy evaluation
+- [x] File `group_project/evaluation/results.md` — bảng điểm + phân tích
+- [x] So sánh A/B ít nhất 2 configs
 
 ---
 
@@ -559,11 +559,12 @@ run_dashboard()
 
 | Thành viên | MSSV | Nhiệm vụ | Trạng thái |
 |-----------|------|----------|------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-
+| Vũ Hải Nam| 2A202601173|Role1: Quản lý nhóm, kiến trúc Supervisor và điều phối thuyết trình demo + Chạy RAGAS benchmark & viết báo cáo results.md. |Đã xong |
+| Ong Xuân Sơn|2A202601327 | Role6: Xây dựng golden_dataset.json mở rộng (20 câu hỏi) + hỗ trợ viết báo cáo result|Đã xong |
+| Nguyễn Minh Nhật| 2A202601131|Role5: hiết kế Streamlit Chatbot app.py + Task 10 (Citation Generation) | Đã xong|
+| Nguyễn Duy Dũng|2A202601505 | Role4: Task 6 (BM25 / TF-IDF) + Task 7 (RRF Reranking) + Task 8 (PageIndex Fallback)|Đã xong |
+| Nguyễn Tiến Thành| 2A202601539| Role 3: Task 4 (Chunking & ChromaDB Indexing) + Task 5 (Semantic Search & HyDE)| Đã xong|
+| Giang Minh Phú|2A202601729 |Role2: Phụ trách Task 1 (tải PDF chính sách) + Task 2 (crawl bài viết tin tức) + Task 3 (convert Markdown) | Đã xong|
 ---
 
 ### Hướng Dẫn Chạy
