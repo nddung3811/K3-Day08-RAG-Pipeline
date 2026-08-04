@@ -604,6 +604,37 @@ graph TD
 
 ---
 
+### Demo Offline & Deploy Local
+
+**Hình thức deploy:** chạy offline/local bằng Streamlit trên máy cá nhân.
+
+**Link chatbot local:** `http://localhost:8501/`
+
+Chạy app bằng lệnh:
+
+```powershell
+cd C:\Users\ASUS\Desktop\DAY08\K3-Day08-RAG-Pipeline
+C:\Users\ASUS\Desktop\DAY08\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+Checklist nghiệm thu demo local:
+
+- Mở được giao diện chatbot tại `http://localhost:8501/`.
+- Chatbot trả lời được câu hỏi thực tế từ corpus văn hóa Việt Nam.
+- Câu trả lời có nguồn tham khảo/citation từ tài liệu đã truy hồi.
+- Giao diện hiển thị phương pháp tìm kiếm, source và relevance score.
+- Conversation memory hoạt động khi hỏi tiếp trong cùng phiên chat.
+
+Ví dụ câu hỏi kiểm tra sau khi chạy app:
+
+```text
+Các yếu tố văn hóa dân gian Việt Nam được khai thác trong thiết kế đồ họa gồm gì?
+```
+
+Kết quả mong đợi: chatbot trả lời dựa trên tài liệu `khaithaccacgiatrivanhoa.md`, nêu được các yếu tố như hoa văn, màu sắc, bố cục, typography, biểu tượng và ứng dụng trong thiết kế hiện đại.
+
+---
+
 ### Hướng Dẫn Chạy
 
 ```bash
