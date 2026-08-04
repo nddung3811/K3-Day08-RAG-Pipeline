@@ -21,6 +21,14 @@ chừng, thử giảm xuống subset 5 câu để chạy kịp trong buổi, ho�
 
 import json
 from pathlib import Path
+import sys
+import asyncio
+import nest_asyncio
+
+# Khắc phục lỗi asyncio deadlock của Ragas trên Windows
+nest_asyncio.apply()
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 GOLDEN_DATASET_PATH = Path(__file__).parent / "golden_dataset.json"
 RESULTS_PATH = Path(__file__).parent / "results.md"
@@ -42,38 +50,8 @@ def evaluate_with_deepeval(rag_pipeline, golden_dataset: list[dict]) -> dict:
 
     pip install deepeval
     """
-    # TODO: Implement
-    #
-    # from deepeval import evaluate
-    # from deepeval.metrics import (
-    #     FaithfulnessMetric,
-    #     AnswerRelevancyMetric,
-    #     ContextualRecallMetric,
-    #     ContextualPrecisionMetric,
-    # )
-    # from deepeval.test_case import LLMTestCase
-    #
-    # test_cases = []
-    # for item in golden_dataset:
-    #     result = rag_pipeline.generate_with_citation(item["question"])
-    #     test_case = LLMTestCase(
-    #         input=item["question"],
-    #         actual_output=result["answer"],
-    #         expected_output=item["expected_answer"],
-    #         retrieval_context=[c["content"] for c in result["sources"]],
-    #     )
-    #     test_cases.append(test_case)
-    #
-    # metrics = [
-    #     FaithfulnessMetric(threshold=0.7),
-    #     AnswerRelevancyMetric(threshold=0.7),
-    #     ContextualRecallMetric(threshold=0.7),
-    #     ContextualPrecisionMetric(threshold=0.7),
-    # ]
-    #
-    # results = evaluate(test_cases, metrics)
-    # return results
-    raise NotImplementedError("Implement evaluate_with_deepeval")
+    # Nhóm đã chọn sử dụng RAGAS, xem hàm `evaluate_with_ragas`
+    pass
 
 
 # =============================================================================
@@ -86,33 +64,32 @@ def evaluate_with_ragas(rag_pipeline, golden_dataset: list[dict]) -> dict:
 
     pip install ragas
     """
-    # TODO: Implement
-    #
-    # from ragas import evaluate
-    # from ragas.metrics import (
-    #     faithfulness,
-    #     answer_relevancy,
-    #     context_recall,
-    #     context_precision,
-    # )
-    # from datasets import Dataset
-    #
-    # eval_data = {"question": [], "answer": [], "contexts": [], "ground_truth": []}
-    #
-    # for item in golden_dataset:
-    #     result = rag_pipeline.generate_with_citation(item["question"])
-    #     eval_data["question"].append(item["question"])
-    #     eval_data["answer"].append(result["answer"])
-    #     eval_data["contexts"].append([c["content"] for c in result["sources"]])
-    #     eval_data["ground_truth"].append(item["expected_answer"])
-    #
-    # dataset = Dataset.from_dict(eval_data)
-    # result = evaluate(
-    #     dataset,
-    #     metrics=[faithfulness, answer_relevancy, context_recall, context_precision],
-    # )
-    # return result.to_pandas()
-    raise NotImplementedError("Implement evaluate_with_ragas")
+    from ragas import evaluate
+    from ragas.metrics import (
+        faithfulness,
+        answer_relevancy,
+        context_recall,
+        context_precision,
+    )
+    from datasets import Dataset
+
+    eval_data = {"question": [], "answer": [], "contexts": [], "ground_truth": []}
+
+    print("Generating answers for evaluation...")
+    for item in golden_dataset:
+        result = rag_pipeline.generate_with_citation(item["question"])
+        eval_data["question"].append(item["question"])
+        eval_data["answer"].append(result["answer"])
+        eval_data["contexts"].append([c.get("content", "") for c in result["sources"]])
+        eval_data["ground_truth"].append(item["expected_answer"])
+
+    dataset = Dataset.from_dict(eval_data)
+    print("Running Ragas evaluation metrics...")
+    result = evaluate(
+        dataset,
+        metrics=[faithfulness, answer_relevancy, context_recall, context_precision],
+    )
+    return result
 
 
 # =============================================================================
@@ -125,19 +102,6 @@ def evaluate_with_trulens(rag_pipeline, golden_dataset: list[dict]) -> dict:
 
     pip install trulens
     """
-    # TODO: Implement
-    #
-    # from trulens.apps.custom import TruCustomApp
-    # from trulens.core import Feedback
-    # from trulens.providers.openai import OpenAI as TruOpenAI
-    #
-    # provider = TruOpenAI()
-    #
-    # f_faithfulness = Feedback(provider.groundedness_measure_with_cot_reasons).on_output()
-    # f_relevance = Feedback(provider.relevance).on_input_output()
-    # f_context_relevance = Feedback(provider.context_relevance).on_input()
-    #
-    # tru_rag = TruCustomApp(
     #     rag_pipeline,
     #     app_name="UniversityServices_RAG",
     #     feedbacks=[f_faithfulness, f_relevance, f_context_relevance],
@@ -164,21 +128,65 @@ def compare_configs(rag_pipeline, golden_dataset: list[dict]):
     - Config B: dense-only (không reranking)
     - Config C: hybrid search + PageIndex fallback
     """
-    # TODO: Implement A/B comparison
-    #
-    # configs = {
-    #     "hybrid_rerank": {"use_reranking": True, "alpha": 0.5},
-    #     "dense_only": {"use_reranking": False, "alpha": 1.0},
-    # }
-    #
-    # results = {}
-    # for config_name, params in configs.items():
-    #     # Run eval with this config
-    #     ...
-    #     results[config_name] = scores
-    #
-    # return results
-    raise NotImplementedError("Implement compare_configs")
+    print("\n[A/B Testing] Running compare_configs...")
+    # Tăng số lượng câu hỏi test lên 20 để thấy rõ sự khác biệt giữa các mô hình (Hybrid vs Dense)
+    test_subset = golden_dataset[:20]
+    
+    configs = {
+        "Config A (hybrid)": "hybrid",
+        "Config B (dense-only)": "semantic",
+    }
+    
+    print("Đang import ragas...")
+    from ragas import evaluate
+    from ragas.metrics import faithfulness, answer_relevancy, context_recall, context_precision
+    print("Đang import datasets...")
+    from datasets import Dataset
+    print("Đang import langchain_openai...")
+    from langchain_openai import ChatOpenAI
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from ragas.run_config import RunConfig
+    import os
+    
+    # Set max_retries=1 để không bị kẹt retry vô tận nếu hết quota/rate limit
+    # Sử dụng API của bên thứ 3 (wokushop.com)
+    openai_key = os.getenv("OPENAI_API_KEY")
+    eval_llm = ChatOpenAI(
+        api_key=openai_key, 
+        base_url="https://llm.wokushop.com/v1",
+        model="gpt-4o-mini",
+        max_retries=2,
+        timeout=120
+    )
+    print("Đang khởi tạo Embeddings (Local)...")
+    # Sử dụng local embeddings để tránh bị treo khi API bên thứ 3 không hỗ trợ embeddings
+    eval_embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-m3")
+    print("Khởi tạo xong API Client!")
+    
+    results = {}
+    for config_name, search_method in configs.items():
+        print(f"\nEvaluating {config_name}...")
+        eval_data = {"question": [], "answer": [], "contexts": [], "ground_truth": []}
+        for item in test_subset:
+            result = rag_pipeline.generate_with_citation(item["question"], search_method=search_method)
+            eval_data["question"].append(item["question"])
+            eval_data["answer"].append(result["answer"])
+            eval_data["contexts"].append([c.get("content", "") for c in result["sources"]])
+            eval_data["ground_truth"].append(item["expected_answer"])
+            
+        dataset = Dataset.from_dict(eval_data)
+        print(f"Bắt đầu gọi API OpenAI chấm điểm cho {config_name}...")
+        eval_result = evaluate(
+            dataset,
+            metrics=[faithfulness, answer_relevancy, context_recall, context_precision],
+            llm=eval_llm,
+            embeddings=eval_embeddings,
+            raise_exceptions=True
+        )
+        print(f"Chấm điểm xong cho {config_name}!")
+        results[config_name] = eval_result
+        
+    return results
 
 
 # =============================================================================
@@ -187,35 +195,46 @@ def compare_configs(rag_pipeline, golden_dataset: list[dict]):
 
 def export_results(results: dict, comparison: dict):
     """Export evaluation results to results.md"""
-    # TODO: Format and write results
-    #
-    # content = "# RAG Evaluation Results\n\n"
-    # content += "## Overall Scores\n\n"
-    # content += "| Metric | Score |\n|--------|-------|\n"
-    # ...
-    # content += "\n## A/B Comparison\n\n"
-    # ...
-    # content += "\n## Worst Performers\n\n"
-    # ...
-    # content += "\n## Recommendations\n\n"
-    # ...
-    #
-    # RESULTS_PATH.write_text(content, encoding="utf-8")
-    raise NotImplementedError("Implement export_results")
+    content = "# RAG Evaluation Results\n\n"
+    content += "## Overall Scores (Config A - Hybrid)\n\n"
+    content += "| Metric | Score |\n|--------|-------|\n"
+    
+    if "Config A (hybrid)" in comparison:
+        res_a = comparison["Config A (hybrid)"]
+        content += f"| Faithfulness | {res_a.get('faithfulness', 0):.4f} |\n"
+        content += f"| Answer Relevance | {res_a.get('answer_relevancy', 0):.4f} |\n"
+        content += f"| Context Recall | {res_a.get('context_recall', 0):.4f} |\n"
+        content += f"| Context Precision | {res_a.get('context_precision', 0):.4f} |\n"
+    
+    content += "\n## A/B Comparison Analysis\n\n"
+    content += "| Metric | Config A (hybrid) | Config B (dense-only) |\n"
+    content += "|--------|-------------------|-----------------------|\n"
+    
+    if "Config A (hybrid)" in comparison and "Config B (dense-only)" in comparison:
+        res_a = comparison["Config A (hybrid)"]
+        res_b = comparison["Config B (dense-only)"]
+        metrics = ["faithfulness", "answer_relevancy", "context_recall", "context_precision"]
+        for m in metrics:
+            val_a = res_a.get(m, 0)
+            val_b = res_b.get(m, 0)
+            content += f"| {m} | {val_a:.4f} | {val_b:.4f} |\n"
+            
+    content += "\n**Kết luận:**\n"
+    content += "> Hybrid search thường cho chỉ số Context Precision cao hơn do BM25 tìm chính xác từ khóa, trong khi Dense-only đôi khi nhạy cảm với cách dùng từ. Điểm Faithfulness phụ thuộc vào LLM Generation.\n"
+    
+    RESULTS_PATH.write_text(content, encoding="utf-8")
+    print(f"\n✅ Đã lưu báo cáo kết quả đánh giá tại: {RESULTS_PATH}")
 
 
 if __name__ == "__main__":
     golden_dataset = load_golden_dataset()
     print(f"Loaded {len(golden_dataset)} test cases")
 
-    # TODO: Import your RAG pipeline
-    # from src.task10_generation import generate_with_citation
-    #
-    # Chọn 1 framework:
-    # results = evaluate_with_deepeval(pipeline, golden_dataset)
-    # results = evaluate_with_ragas(pipeline, golden_dataset)
-    # results = evaluate_with_trulens(pipeline, golden_dataset)
-    #
-    # comparison = compare_configs(pipeline, golden_dataset)
-    # export_results(results, comparison)
-    print("⚠ Implement evaluation logic and run again!")
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    import src.task10_generation as pipeline
+
+    print("Bắt đầu quy trình đánh giá (A/B testing)...")
+    # Chúng ta chạy hàm compare_configs trước, vì nó sẽ tự evaluate
+    comparison = compare_configs(pipeline, golden_dataset)
+    export_results(None, comparison)
