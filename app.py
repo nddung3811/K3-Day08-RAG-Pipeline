@@ -1,151 +1,125 @@
-"""
-RAG Chatbot — University Services (Starter Template)
-Streamlit app kết nối RAG Retrieval (Task 9) và Generation (Task 10).
+"""Trợ lý văn hóa Việt Nam — Streamlit UI.
 
-Chạy:
-    streamlit run app.py
+Chạy bằng: streamlit run app.py
+Backend RAG được gọi qua ``src.task10_generation`` khi đã implement.
 """
 
-import os
-import sys
 from pathlib import Path
+import sys
 
 import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# Thêm project root vào sys.path để import các task từ src/
 PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-# =============================================================================
-# PAGE CONFIG
-# =============================================================================
-
 st.set_page_config(
-    page_title="University Services RAG Chatbot",
-    page_icon="🎓",
+    page_title="Nếp Việt · Trợ lý văn hóa",
+    page_icon="🏮",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# =============================================================================
-# SIDEBAR — INFO & SETTINGS
-# =============================================================================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+:root { --ink:#2f211b; --red:#9f2d24; --gold:#d39a34; --cream:#fff9ed; }
+.stApp { background:var(--cream); color:var(--ink); font-family:'Be Vietnam Pro',sans-serif; }
+[data-testid="stSidebar"] { background:#321f1a; border-right:1px solid #5d382b; }
+[data-testid="stSidebar"] * { color:#fff8e9 !important; }
+.hero { padding:2.2rem 2.5rem; border-radius:24px; background:linear-gradient(120deg,#681d1a 0%,#a63829 55%,#d48e31 150%); color:white; box-shadow:0 10px 28px #8e483022; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:3rem; margin:0 0 .4rem; color:#fff9ed; }
+.hero p { max-width:730px; font-size:1.06rem; margin:0; color:#ffeac0; }
+.eyebrow { color:#f3ca74; letter-spacing:.12em; text-transform:uppercase; font-size:.75rem; font-weight:700; }
+.card { background:white; border:1px solid #ead9b9; border-radius:16px; padding:1.15rem; height:100%; box-shadow:0 4px 14px #8e483010; }
+.card h3 { margin:.2rem 0 .4rem; color:var(--red); font-size:1.05rem; }
+.card p { color:#6c5849; font-size:.9rem; margin:0; }
+.section-title { font-family:'Playfair Display',serif; color:var(--red); font-size:1.55rem; margin:1.8rem 0 .8rem; }
+.source { border-left:4px solid var(--gold); background:#fffaf0; padding:.75rem 1rem; border-radius:0 10px 10px 0; margin:.5rem 0; }
+.source small { color:#80684f; }
+div[data-testid="stChatMessage"] { background:#fff; border:1px solid #ead9b9; border-radius:16px; margin:.6rem 0; }
+.stButton button { border-radius:10px; border-color:#c99a54; }
+</style>
+""", unsafe_allow_html=True)
+
+TOPICS = ["Tất cả chủ đề", "Phong tục tập quán", "Trang phục truyền thống", "Lễ hội Việt Nam"]
+SUGGESTIONS = [
+    "Ý nghĩa của tục xông đất đầu năm và những điều kiêng kỵ trong ngày Tết là gì?",
+    "Áo ngũ thân nam gồm những chi tiết nào và khác gì Áo dài tân thời?",
+    "Lễ hội Gióng có ý nghĩa lịch sử và nghi thức tiêu biểu nào?",
+    "Trang phục truyền thống của các dân tộc Việt Nam có điểm gì đặc sắc?",
+]
 
 with st.sidebar:
-    st.title("🎓 University Services RAG")
-    st.caption("Trợ lý hỏi đáp về dịch vụ và chính sách đại học (học phí, học bổng, ký túc xá, thư viện)")
-
+    st.markdown("# 🏮 Nếp Việt")
+    st.caption("Tra cứu phong tục, trang phục và lễ hội truyền thống Việt Nam")
     st.divider()
-
-    st.subheader("💡 Câu hỏi gợi ý")
-    suggestions = [
-        "Học phí tại RMIT Vietnam là bao nhiêu?",
-        "Làm sao để đặt phòng học nhóm ở thư viện?",
-        "Điều kiện xin học bổng Academic Achievement?",
-        "Dịch vụ hỗ trợ chỗ ở cho sinh viên như thế nào?",
-        "Cách đăng ký học phần qua myRMIT?",
-    ]
-    for s in suggestions:
-        if st.button(s, use_container_width=True, key=f"sug_{s[:20]}"):
-            st.session_state["pending_query"] = s
-
+    st.markdown("### Khám phá theo chủ đề")
+    topic = st.selectbox("Chủ đề", TOPICS, label_visibility="collapsed")
+    region = st.selectbox("Vùng văn hóa", ["Tất cả vùng miền", "Bắc Bộ", "Trung Bộ", "Nam Bộ", "Các dân tộc Việt Nam"])
     st.divider()
-    st.subheader("⚙️ Thiết lập")
-    top_k = st.slider("Số chunks retrieval (top_k)", 3, 10, 5)
-
+    st.markdown("### Câu hỏi gợi ý")
+    for i, question in enumerate(SUGGESTIONS):
+        if st.button(question, key=f"suggestion_{i}", use_container_width=True):
+            st.session_state.pending_query = question
     st.divider()
-    st.caption("**Kiến trúc hệ thống:**")
-    st.caption("Hybrid Retrieval (Semantic + BM25) → RRF Rerank → PageIndex Fallback → LLM Generation có Citation")
-
-# =============================================================================
-# SESSION STATE
-# =============================================================================
+    st.caption("Nguồn định hướng")
+    st.caption("Viện Nghiên cứu Văn hóa · Sách Văn hóa Dân gian Việt Nam · Hồ sơ Di sản Văn hóa Phi vật thể")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "pending_query" not in st.session_state:
     st.session_state.pending_query = None
 
-# =============================================================================
-# MAIN CHAT AREA
-# =============================================================================
+st.markdown("""
+<div class="hero">
+  <div class="eyebrow">Di sản · Bản sắc · Ký ức</div>
+  <h1>Hiểu hơn về Nếp Việt</h1>
+  <p>Trợ lý giải đáp phong tục, trang phục và lễ hội truyền thống Việt Nam — từ những nghi lễ thân thuộc trong đời sống đến di sản văn hóa của 54 dân tộc.</p>
+</div>
+""", unsafe_allow_html=True)
 
-st.title("🎓 University Services RAG Chatbot")
-st.caption("Hệ thống hỏi đáp thông tin dịch vụ đại học (Học phí, Học bổng, Ký túc xá, Thư viện)")
+st.markdown('<div class="section-title">Hôm nay bạn muốn tìm hiểu điều gì?</div>', unsafe_allow_html=True)
+cols = st.columns(3)
+for col, icon, title, desc in zip(cols, ["🌾", "👘", "🎏"], ["Phong tục tập quán", "Trang phục truyền thống", "Lễ hội Việt Nam"], ["Ý nghĩa, nguồn gốc và những điều nên biết", "Áo dài, áo ngũ thân và trang phục 54 dân tộc", "Nghi lễ, câu chuyện và giá trị cộng đồng"]):
+    with col:
+        st.markdown(f'<div class="card"><div style="font-size:1.8rem">{icon}</div><h3>{title}</h3><p>{desc}</p></div>', unsafe_allow_html=True)
 
-# Hiển thị lịch sử chat
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        if msg["role"] == "assistant" and "sources" in msg and msg["sources"]:
-            with st.expander(f"📚 Nguồn tham khảo ({len(msg['sources'])} chunks)"):
-                for i, src in enumerate(msg["sources"], 1):
-                    meta = src.get("metadata", {})
-                    source_name = meta.get("source", "Unknown")
-                    doc_type = meta.get("type", "unknown")
-                    score = src.get("score", 0)
-                    st.markdown(f"**[{i}] {source_name}** `{doc_type}` | score: `{score:.4f}`")
-                    st.text(src.get("content", "")[:300] + "...")
-                    st.divider()
+st.markdown('<div class="section-title">Cuộc trò chuyện</div>', unsafe_allow_html=True)
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        if message.get("sources"):
+            with st.expander(f"📚 Nguồn tham khảo ({len(message['sources'])})"):
+                for source in message["sources"]:
+                    st.markdown(f'<div class="source"><b>{source}</b><br><small>Hồ sơ di sản · Tài liệu văn hóa dân gian</small></div>', unsafe_allow_html=True)
 
-# =============================================================================
-# QUERY HANDLING
-# =============================================================================
-
-# Xử lý khi bấm nút gợi ý hoặc nhập câu hỏi mới
-user_input = st.chat_input("Nhập câu hỏi của bạn về chính sách/dịch vụ đại học...")
-query = user_input or st.session_state.pending_query
-
+query = st.chat_input("Ví dụ: Ý nghĩa của tục xông đất đầu năm là gì?") or st.session_state.pending_query
 if query:
     st.session_state.pending_query = None
-
-    # Hiển thị câu hỏi của user
     st.session_state.messages.append({"role": "user", "content": query})
     with st.chat_message("user"):
         st.markdown(query)
-
-    # Sinh câu trả lời từ RAG Pipeline
     with st.chat_message("assistant"):
-        with st.spinner("Đang tìm kiếm tài liệu và tổng hợp câu trả lời..."):
+        with st.spinner("Đang tra cứu tư liệu văn hóa…"):
             try:
-                # TODO (Học viên): Tích hợp hàm sinh câu trả lời từ Task 10
-                # Ví dụ:
-                # from src.task10_generation import generate_with_citation
-                # response = generate_with_citation(query, top_k=top_k)
-                # answer = response["answer"]
-                # sources = response.get("sources", [])
-
-                # Tạm thời mockup để test UI:
                 from src.task10_generation import generate_with_citation
-                response = generate_with_citation(query, top_k=top_k)
-                answer = response.get("answer", "Chưa thể trả lời.")
-                sources = response.get("sources", [])
-
-            except NotImplementedError:
-                answer = "⚠️ **Task 10 chưa được implement.** Hãy hoàn thành `src/task10_generation.py` để kết nối pipeline vào UI!"
+                response = generate_with_citation(query, top_k=5)
+                answer = response.get("answer", "Chưa có câu trả lời từ nguồn dữ liệu hiện có.")
+                sources = [s.get("metadata", {}).get("source", "Tài liệu văn hóa") for s in response.get("sources", [])]
+            except (NotImplementedError, ImportError):
+                answer = "Mình đã nhận câu hỏi. Hãy hoàn thiện pipeline RAG ở `src/task9_retrieval_pipeline.py` và `src/task10_generation.py` để trả lời dựa trên tư liệu đã lập chỉ mục."
                 sources = []
-            except Exception as e:
-                answer = f"❌ **Lỗi khi chạy RAG Pipeline:** {e}"
+            except Exception as exc:
+                answer = f"Chưa thể truy cập bộ tư liệu lúc này. Chi tiết kỹ thuật: `{exc}`"
                 sources = []
+        st.markdown(answer)
+        if sources:
+            with st.expander(f"📚 Nguồn tham khảo ({len(sources)})"):
+                for source in sources:
+                    st.markdown(f'<div class="source"><b>{source}</b><br><small>Tư liệu đã được truy hồi từ kho dữ liệu</small></div>', unsafe_allow_html=True)
+    st.session_state.messages.append({"role": "assistant", "content": answer, "sources": sources})
 
-            st.markdown(answer)
-
-            if sources:
-                with st.expander(f"📚 Nguồn tham khảo ({len(sources)} chunks)"):
-                    for i, src in enumerate(sources, 1):
-                        meta = src.get("metadata", {})
-                        source_name = meta.get("source", "Unknown")
-                        doc_type = meta.get("type", "unknown")
-                        score = src.get("score", 0)
-                        st.markdown(f"**[{i}] {source_name}** `{doc_type}` | score: `{score:.4f}`")
-                        st.text(src.get("content", "")[:300] + "...")
-                        st.divider()
-
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": answer,
-        "sources": sources,
-    })
+if not st.session_state.messages:
+    st.info("💬 Chọn một câu hỏi gợi ý ở thanh bên hoặc nhập câu hỏi ở ô trò chuyện bên dưới.")
